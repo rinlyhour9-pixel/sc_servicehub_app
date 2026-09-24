@@ -74,16 +74,16 @@ rather than a local mock list per screen.
 
 Right now `MyBookingScreen` and `BookingFormScreen` each keep their own
 mock data — swap that for a shared state solution (see below) once you
-connect a backend, so a booking made through the flow actually appears in
+use the built-in in-memory preview state, so a booking made through the flow appears in
 the My Booking list.
 
-## Suggested next steps
+## Static app
 
 1. **State management**: replace the local mock lists in
    `MyBookingScreen` / `NotificationScreen` with `Provider`, `Riverpod`, or
    `Bloc` so a booking created on Home instantly reflects in Booking/Notification.
-2. **Networking**: add a `lib/services/api_service.dart` (e.g. using `dio` or
-   `http`) once you have a backend, and a `lib/services/` layer per model.
+2. **Static behavior**: form fields and sample content remain only in memory
+   for the current session; no information leaves the app.
 3. **Routing**: if you outgrow the simple `IndexedStack` pattern (e.g. need
    deep links or a detail page pushed on top of a tab), introduce
    `go_router` and keep `MainNavigation` as a `ShellRoute`.

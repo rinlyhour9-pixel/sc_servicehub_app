@@ -13,9 +13,13 @@ class AppHeaderBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.fromLTRB(12, MediaQuery.of(context).padding.top + 8, 20, 20),
+      padding: EdgeInsets.fromLTRB(12, MediaQuery.of(context).padding.top + 10, 20, 22),
       decoration: const BoxDecoration(
-        color: AppColors.primary,
+        gradient: LinearGradient(
+          colors: [AppColors.primary, AppColors.primaryDark],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
         borderRadius: BorderRadius.vertical(bottom: Radius.circular(24)),
       ),
       child: Row(
@@ -24,8 +28,8 @@ class AppHeaderBar extends StatelessWidget {
             borderRadius: BorderRadius.circular(20),
             onTap: onBack ?? () => Navigator.of(context).pop(),
             child: const CircleAvatar(
-              radius: 18,
-              backgroundColor: Colors.white24,
+              radius: 19,
+              backgroundColor: Color(0x33FFFFFF),
               child: Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 16),
             ),
           ),
@@ -33,7 +37,7 @@ class AppHeaderBar extends StatelessWidget {
             child: Text(
               title,
               textAlign: TextAlign.center,
-              style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+              style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w700),
             ),
           ),
           const SizedBox(width: 36),

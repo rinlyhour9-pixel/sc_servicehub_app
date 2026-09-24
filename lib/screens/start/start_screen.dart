@@ -81,10 +81,11 @@ class _StartScreenState extends State<StartScreen> {
                             const SizedBox(height: 28),
                             Text(
                               l10n.appTagline,
+                              textAlign: TextAlign.center,
                               style: const TextStyle(
-                                  fontSize: 18, color: AppColors.textSecondary),
+                                  fontSize: 17, height: 1.4, color: AppColors.textSecondary),
                             ),
-                            const SizedBox(height: 56),
+                            const SizedBox(height: 48),
                             _RoleButton(
                               label: l10n.roleClient,
                               onTap: () =>
@@ -193,7 +194,9 @@ class _RoleButton extends StatelessWidget {
       child: OutlinedButton(
         onPressed: onTap,
         style: OutlinedButton.styleFrom(
-          side: const BorderSide(color: AppColors.primary),
+          side: const BorderSide(color: AppColors.primary, width: 1.3),
+          backgroundColor: Colors.white,
+          elevation: 0,
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
         ),

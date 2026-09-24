@@ -17,13 +17,28 @@ class BookingCard extends StatelessWidget {
     final dateStr = DateFormat('EEE, dd MMM yyyy').format(booking.dateTime);
     final timeStr = DateFormat('hh:mm a').format(booking.dateTime);
 
-    return InkWell(
-      onTap: onTap,
+    final (statusBackground, statusForeground) = switch (booking.status) {
+      BookingStatus.pending => (AppColors.warningBg, AppColors.warning),
+      BookingStatus.accepted || BookingStatus.inProgress =>
+        (AppColors.pendingBg, AppColors.pendingText),
+      BookingStatus.completed => (AppColors.successBg, AppColors.success),
+      BookingStatus.cancelled => (AppColors.dangerBg, AppColors.danger),
+    };
+
+    return Material(
+      color: Colors.white,
       borderRadius: BorderRadius.circular(18),
-      child: Container(
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(18),
+        child: Container(
         margin: const EdgeInsets.only(bottom: 14),
         padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(18)),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: AppColors.border),
+          boxShadow: const [BoxShadow(color: Color(0x0A0B5FA8), blurRadius: 12, offset: Offset(0, 5))],
+        ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -45,12 +60,12 @@ class BookingCard extends StatelessWidget {
                       ),
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                        decoration: BoxDecoration(color: AppColors.pendingBg, borderRadius: BorderRadius.circular(20)),
-                        child: Text(bookingStatusLabel(l10n, booking.status), style: const TextStyle(color: AppColors.pendingText, fontSize: 12)),
+                        decoration: BoxDecoration(color: statusBackground, borderRadius: BorderRadius.circular(20)),
+                        child: Text(bookingStatusLabel(l10n, booking.status), style: TextStyle(color: statusForeground, fontSize: 11, fontWeight: FontWeight.w700)),
                       ),
                     ],
                   ),
-                  Text(l10n.serviceIdPrefix(booking.id), style: const TextStyle(color: AppColors.textSecondary, fontSize: 12)),
+                  Text(l10n.serviceIdPrefix(booking.id), style: const TextStyle(color: AppColors.textSecondary, fontSize: 11, fontWeight: FontWeight.w500)),
                   const SizedBox(height: 6),
                   Row(
                     children: [
@@ -68,7 +83,7 @@ class BookingCard extends StatelessWidget {
                     children: [
                       const Icon(Icons.location_on_outlined, size: 13, color: AppColors.primary),
                       const SizedBox(width: 4),
-                      Expanded(child: Text(booking.address, style: const TextStyle(fontSize: 12))),
+                      Expanded(child: Text(booking.address, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 12))),
                     ],
                   ),
                 ],
@@ -76,6 +91,7 @@ class BookingCard extends StatelessWidget {
             ),
           ],
         ),
+      ),
       ),
     );
   }

@@ -54,7 +54,11 @@ class NotificationScreen extends StatelessWidget {
           width: double.infinity,
           padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
           decoration: const BoxDecoration(
-            color: AppColors.primary,
+            gradient: LinearGradient(
+              colors: [AppColors.primary, AppColors.primaryDark],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
             borderRadius: BorderRadius.vertical(bottom: Radius.circular(24)),
           ),
           child: Column(
@@ -64,9 +68,10 @@ class NotificationScreen extends StatelessWidget {
                   style: const TextStyle(
                       color: Colors.white,
                       fontSize: 24,
-                      fontWeight: FontWeight.bold)),
+                      fontWeight: FontWeight.w700)),
+              const SizedBox(height: 4),
               Text(l10n.notificationSubtitle,
-                  style: const TextStyle(color: Colors.white70)),
+                  style: const TextStyle(color: Colors.white70, height: 1.35)),
             ],
           ),
         ),
@@ -107,8 +112,8 @@ class _NotificationTile extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border:
-            const Border(left: BorderSide(color: AppColors.primary, width: 6)),
+        border: Border.all(color: AppColors.border),
+        boxShadow: const [BoxShadow(color: Color(0x080B5FA8), blurRadius: 12, offset: Offset(0, 4))],
       ),
       padding: const EdgeInsets.all(14),
       child: Row(
@@ -125,7 +130,7 @@ class _NotificationTile extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(notification.title,
-                    style: const TextStyle(fontWeight: FontWeight.bold)),
+                    style: const TextStyle(fontWeight: FontWeight.w700)),
                 const SizedBox(height: 2),
                 Text(notification.message,
                     style: const TextStyle(

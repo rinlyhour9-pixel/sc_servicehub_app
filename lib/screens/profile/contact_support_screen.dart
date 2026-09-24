@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/app_colors.dart';
 import '../../l10n/app_localizations.dart';
@@ -9,16 +8,6 @@ import '../../widgets/app_header_bar.dart';
 /// Profile > Contact Support tile.
 class ContactSupportScreen extends StatelessWidget {
   const ContactSupportScreen({super.key});
-
-  Future<void> _open(BuildContext context, Uri uri) async {
-    final l10n = AppLocalizations.of(context)!;
-    final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
-    if (!launched && context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.couldNotOpenMsg(uri.toString()))),
-      );
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -53,19 +42,19 @@ class ContactSupportScreen extends StatelessWidget {
                             icon: Icons.chat_bubble_outline,
                             title: l10n.chatWithUsTitle,
                             subtitle: l10n.chatWithUsSubtitle,
-                            onTap: () => _open(context, Uri.parse('https://m.me/softcreative.com.kh')),
+                            onTap: () => _showStaticNotice(context),
                           ),
                           _HelpTile(
                             icon: Icons.mail_outline,
                             title: l10n.emailSupportTitle,
                             subtitle: l10n.emailSupportSubtitle,
-                            onTap: () => _open(context, Uri(scheme: 'mailto', path: 'support@softcreative.com.kh')),
+                            onTap: () => _showStaticNotice(context),
                           ),
                           _HelpTile(
                             icon: Icons.call_outlined,
                             title: l10n.callUsTitle,
                             subtitle: l10n.callUsSubtitle,
-                            onTap: () => _open(context, Uri(scheme: 'tel', path: '+855123456789')),
+                            onTap: () => _showStaticNotice(context),
                           ),
                           _HelpTile(
                             icon: Icons.help_outline,
@@ -91,14 +80,12 @@ class ContactSupportScreen extends StatelessWidget {
                   icon: Icons.language,
                   label: l10n.websiteLabel,
                   value: 'www.softcreative.com.kh',
-                  onTap: () => _open(context, Uri.https('www.softcreative.com.kh')),
                 ),
                 const SizedBox(height: 12),
                 _ContactRow(
                   icon: Icons.facebook,
                   label: l10n.facebookLabel,
                   value: 'facebook.com/softcreative.com.kh',
-                  onTap: () => _open(context, Uri.https('facebook.com', '/softcreative.com.kh')),
                 ),
               ],
             ),
@@ -133,6 +120,12 @@ class ContactSupportScreen extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  void _showStaticNotice(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Contact links are unavailable in the static preview.')),
     );
   }
 }
@@ -211,51 +204,42 @@ class _ContactRow extends StatelessWidget {
   final IconData icon;
   final String label;
   final String value;
-  final VoidCallback? onTap;
-
   const _ContactRow({
     required this.icon,
     required this.label,
     required this.value,
-    this.onTap,
   });
 
   @override
-  Widget build(BuildContext context) => Material(
-        color: Colors.transparent,
-        child: InkWell(
+  Widget build(BuildContext context) => Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: Colors.white,
           borderRadius: BorderRadius.circular(14),
-          onTap: onTap,
-          child: Container(
-            padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: AppColors.border),
+          border: Border.all(color: AppColors.border),
+        ),
+        child: Row(
+          children: [
+            CircleAvatar(
+              radius: 20,
+              backgroundColor: AppColors.tileBackground,
+              foregroundColor: AppColors.primary,
+              child: Icon(icon, size: 18),
             ),
-            child: Row(
-              children: [
-                CircleAvatar(
-                  radius: 20,
-                  backgroundColor: AppColors.tileBackground,
-                  foregroundColor: AppColors.primary,
-                  child: Icon(icon, size: 18),
-                ),
-                const SizedBox(width: 14),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(label,
-                          style: const TextStyle(
-                              color: AppColors.primary, fontWeight: FontWeight.w600, fontSize: 13)),
-                      const SizedBox(height: 2),
-                      Text(value, style: const TextStyle(fontSize: 13)),
-                    ],
-                  ),
-                ),
-              ],
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(label,
+                      style: const TextStyle(
+                          color: AppColors.primary, fontWeight: FontWeight.w600, fontSize: 13)),
+                  const SizedBox(height: 2),
+                  Text(value, style: const TextStyle(fontSize: 13)),
+                ],
+              ),
             ),
-          ),
+          ],
         ),
       );
 }

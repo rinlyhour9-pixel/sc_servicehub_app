@@ -74,6 +74,8 @@ class _HomeScreenState extends State<HomeScreen> {
           decoration: BoxDecoration(
             color: AppColors.card,
             borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: AppColors.border),
+            boxShadow: const [BoxShadow(color: Color(0x080B5FA8), blurRadius: 14, offset: Offset(0, 5))],
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -153,20 +155,24 @@ class _CategoryTile extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(16),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               const SizedBox(height: 10),
               Container(
-                width: 56,
-                height: 56,
-                padding: const EdgeInsets.all(10),
-                decoration: const BoxDecoration(
-                  color: AppColors.tileBackground,
-                  shape: BoxShape.circle,
+                width: 64,
+                height: 64,
+                clipBehavior: Clip.antiAlias,
+                decoration: BoxDecoration(
+                  // The service artwork has an opaque, light background. A
+                  // rounded surface makes it feel deliberate instead of
+                  // showing a square image inside the former blue circle.
+                  color: const Color(0xFFFAF8F5),
+                  borderRadius: BorderRadius.circular(18),
+                  border: Border.all(color: AppColors.border.withValues(alpha: 0.55)),
                 ),
-                child: Image.asset(category.iconAsset, fit: BoxFit.contain),
+                child: Image.asset(category.iconAsset, fit: BoxFit.cover),
               ),
               const SizedBox(height: 8),
               Text(category.name(AppLocalizations.of(context)!),
@@ -207,7 +213,21 @@ class _PromotionalBanner extends StatelessWidget {
             onPageChanged: onPageChanged,
             itemBuilder: (context, index) => ClipRRect(
               borderRadius: BorderRadius.circular(14),
-              child: Image.asset(banners[index], fit: BoxFit.cover),
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                Image.asset(banners[index], fit: BoxFit.cover),
+                const DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [Color(0x00000000), Color(0x14000000)],
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                    ),
+                  ),
+                ),
+              ],
+            ),
             ),
           ),
         ),

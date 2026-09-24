@@ -41,15 +41,31 @@ class GreetingHeader extends StatelessWidget {
         child: Stack(
           fit: StackFit.expand,
           children: [
-            Image.asset(AppAssets.infoBanner, fit: BoxFit.fill),
+            Image.asset(AppAssets.infoBanner, fit: BoxFit.cover),
+            const Positioned.fill(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Color(0x0DFFFFFF), Color(0x140B5FA8)],
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                  ),
+                ),
+              ),
+            ),
             Padding(
               padding: const EdgeInsets.fromLTRB(18, 12, 14, 12),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(children: [
-                    const Icon(Icons.location_on_outlined,
-                        size: 25, color: AppColors.textPrimary),
+                    Container(
+                      width: 32,
+                      height: 32,
+                      decoration: const BoxDecoration(color: Color(0xDFFFFFFF), shape: BoxShape.circle),
+                      child: const Icon(Icons.location_on_outlined,
+                          size: 18, color: AppColors.primary),
+                    ),
                     const SizedBox(width: 7),
                     const Expanded(
                       child: Text('Preysor, Phnom Penh',
@@ -57,7 +73,7 @@ class GreetingHeader extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                             fontSize: 13,
-                            fontWeight: FontWeight.w500,
+                        fontWeight: FontWeight.w600,
                             color: AppColors.textPrimary,
                           )),
                     ),
@@ -70,7 +86,7 @@ class GreetingHeader extends StatelessWidget {
                             width: 36, height: 36),
                         icon: Stack(clipBehavior: Clip.none, children: [
                           const Icon(Icons.notifications_none_rounded,
-                              size: 27, color: AppColors.textPrimary),
+                              size: 25, color: AppColors.textPrimary),
                           if (notificationCount != null)
                             Positioned(
                               right: -3,
@@ -106,7 +122,7 @@ class GreetingHeader extends StatelessWidget {
                             Text(name,
                                 style: const TextStyle(
                                   color: AppColors.textPrimary,
-                                  fontSize: 23,
+                                  fontSize: 22,
                                   fontWeight: FontWeight.w700,
                                 )),
                             const SizedBox(height: 1),
@@ -115,7 +131,7 @@ class GreetingHeader extends StatelessWidget {
                                 overflow: TextOverflow.ellipsis,
                                 style: const TextStyle(
                                   color: AppColors.textSecondary,
-                                  fontSize: 10,
+                                  fontSize: 11,
                                 )),
                           ],
                         ),

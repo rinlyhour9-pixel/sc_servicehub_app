@@ -22,7 +22,7 @@ class ServiceDetailScreen extends StatelessWidget {
             _TopBar(title: l10n.serviceDetailsTitle),
             Expanded(
               child: ListView(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
+                padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
                 children: [
                   ClipRRect(
                     borderRadius: BorderRadius.circular(20),
@@ -41,9 +41,13 @@ class ServiceDetailScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 18),
-                  Text(category.name(l10n), style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                  Text(category.name(l10n), style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w700)),
                   const SizedBox(height: 8),
-                  Text(l10n.verifiedProsSubtitle, style: const TextStyle(fontSize: 13, color: AppColors.textSecondary)),
+                  Row(children: [
+                    const Icon(Icons.verified_rounded, size: 16, color: AppColors.success),
+                    const SizedBox(width: 6),
+                    Text(l10n.verifiedProsSubtitle, style: const TextStyle(fontSize: 13, color: AppColors.textSecondary)),
+                  ]),
                   const SizedBox(height: 10),
                   Text(
                     category.description(l10n),
@@ -52,11 +56,15 @@ class ServiceDetailScreen extends StatelessWidget {
                   const SizedBox(height: 20),
                   Container(
                     padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16)),
-                    child: Row(children: [Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(l10n.startingFromLabel, style: const TextStyle(color: AppColors.textSecondary, fontSize: 12)), const SizedBox(height: 2), const Text('\$15.00', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: AppColors.primary))])), const Icon(Icons.verified_outlined, color: AppColors.success)]),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: AppColors.border),
+                    ),
+                    child: Row(children: [Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(l10n.startingFromLabel, style: const TextStyle(color: AppColors.textSecondary, fontSize: 12, fontWeight: FontWeight.w500)), const SizedBox(height: 2), const Text('\$15.00', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w700, color: AppColors.primary))])), Container(padding: const EdgeInsets.all(10), decoration: const BoxDecoration(color: AppColors.successBg, shape: BoxShape.circle), child: const Icon(Icons.verified_rounded, color: AppColors.success))]),
                   ),
                   const SizedBox(height: 20),
-                  Text(l10n.whatsIncludedTitle, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  Text(l10n.whatsIncludedTitle, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
                   const SizedBox(height: 12),
                   ...category.included(l10n).map(
                     (item) => Padding(
@@ -65,7 +73,7 @@ class ServiceDetailScreen extends StatelessWidget {
                         children: [
                           const Icon(Icons.check_circle, color: AppColors.success, size: 20),
                           const SizedBox(width: 10),
-                          Text(item),
+                          Expanded(child: Text(item, style: const TextStyle(fontSize: 14))),
                         ],
                       ),
                     ),
@@ -74,15 +82,16 @@ class ServiceDetailScreen extends StatelessWidget {
                 ],
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+            Container(
+              padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+              decoration: const BoxDecoration(color: AppColors.background, boxShadow: [BoxShadow(color: Color(0x12000000), blurRadius: 14, offset: Offset(0, -4))]),
               child: SizedBox(
                 width: double.infinity,
                 height: 52,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                   ),
                   onPressed: () {
                     Navigator.push(

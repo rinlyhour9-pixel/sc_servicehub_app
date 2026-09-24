@@ -41,9 +41,18 @@ class AuthScaffold extends StatelessWidget {
         children: [
           SafeArea(
             bottom: false,
-            child: Padding(
-              padding: EdgeInsets.fromLTRB(20, showBack ? 4 : 20, 20, 30),
-              child: Column(
+            child: Container(
+              width: double.infinity,
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [AppColors.primary, AppColors.primaryDark],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+              ),
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(20, showBack ? 4 : 20, 20, 30),
+                child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   if (showBack)
@@ -82,6 +91,7 @@ class AuthScaffold extends StatelessWidget {
                 ],
               ),
             ),
+          ),
           ),
           Expanded(
             child: Container(
@@ -129,7 +139,7 @@ class AuthField extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(fontWeight: FontWeight.w600)),
+        Text(label, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
         const SizedBox(height: 8),
         TextFormField(
           controller: controller,
@@ -141,14 +151,14 @@ class AuthField extends StatelessWidget {
             prefixIcon: Icon(icon, color: AppColors.textSecondary),
             suffixIcon: suffixIcon,
             filled: true,
-            fillColor: AppColors.background,
+            fillColor: AppColors.primarySoft,
             contentPadding: const EdgeInsets.symmetric(vertical: 17),
             border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(14),
-                borderSide: BorderSide.none),
+                borderSide: const BorderSide(color: AppColors.border)),
             enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(14),
-                borderSide: BorderSide.none),
+                borderSide: const BorderSide(color: AppColors.border)),
             focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(14),
                 borderSide:
@@ -178,6 +188,7 @@ class PrimaryAuthButton extends StatelessWidget {
           backgroundColor: AppColors.primary,
           foregroundColor: Colors.white,
           elevation: 0,
+          shadowColor: AppColors.primary.withValues(alpha: .32),
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
         ),

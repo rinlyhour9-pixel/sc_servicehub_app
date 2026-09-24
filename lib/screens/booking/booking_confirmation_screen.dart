@@ -22,11 +22,11 @@ class BookingConfirmationScreen extends StatelessWidget {
               Container(
                 width: 160,
                 height: 160,
-                decoration: const BoxDecoration(color: AppColors.tileBackground, shape: BoxShape.circle),
-                child: const Icon(Icons.assignment_turned_in_outlined, size: 72, color: AppColors.primary),
+                decoration: const BoxDecoration(color: AppColors.successBg, shape: BoxShape.circle),
+                child: const Icon(Icons.check_circle_rounded, size: 76, color: AppColors.success),
               ),
               const SizedBox(height: 28),
-              Text(l10n.bookingRequestSendTitle, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+              Text(l10n.bookingRequestSendTitle, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w700)),
               const SizedBox(height: 10),
               Text(
                 l10n.bookingReceivedBody,
@@ -37,12 +37,12 @@ class BookingConfirmationScreen extends StatelessWidget {
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
-                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16)),
+                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: AppColors.border)),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(l10n.bookingIdLabel, style: const TextStyle(fontWeight: FontWeight.w600)),
-                    Text(booking.id, style: const TextStyle(fontWeight: FontWeight.bold)),
+                    Text(booking.id, style: const TextStyle(fontWeight: FontWeight.w700, color: AppColors.primary)),
                   ],
                 ),
               ),

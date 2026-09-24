@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../core/app_colors.dart';
 import '../../l10n/app_localizations.dart';
-import '../../data/admin_booking_store.dart';
+import '../../state/admin_booking_store.dart';
 import '../../models/customer_profile.dart';
 import 'admin_add_client_screen.dart';
 import 'admin_customer_profile_screen.dart';
@@ -10,7 +10,7 @@ import 'admin_customer_profile_screen.dart';
 class AdminCustomerListScreen extends StatelessWidget {
   const AdminCustomerListScreen({super.key});
 
-  // TODO: replace with data from your customer management API.
+  // Bundled sample customers for the static preview.
   static const _customers = [
     CustomerProfile(name: 'Jonh Smith', phone: '+855 12 111 222', id: 'ID-10021'),
     CustomerProfile(name: 'Mary Janeeeee', phone: '+855 12 333 444', id: 'ID-10022'),

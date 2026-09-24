@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../core/app_colors.dart';
 import '../../core/status_labels.dart';
-import '../../data/admin_booking_store.dart';
+import '../../state/admin_booking_store.dart';
 import '../../l10n/app_localizations.dart';
 import '../../models/admin_booking_entry.dart';
 import 'admin_track_booking_screen.dart';
@@ -128,6 +128,11 @@ class _BookingListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final (statusBackground, statusForeground) = switch (data.stage) {
+      AdminBookingStage.pending => (AppColors.warningBg, AppColors.warning),
+      AdminBookingStage.inProgress => (AppColors.pendingBg, AppColors.pendingText),
+      AdminBookingStage.complete => (AppColors.successBg, AppColors.success),
+    };
     return Material(
       color: Colors.white,
       borderRadius: BorderRadius.circular(14),
@@ -145,6 +150,7 @@ class _BookingListTile extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(14),
             border: Border.all(color: AppColors.border),
+            boxShadow: const [BoxShadow(color: Color(0x080B5FA8), blurRadius: 12, offset: Offset(0, 4))],
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -158,10 +164,10 @@ class _BookingListTile extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
                     decoration: BoxDecoration(
-                        color: AppColors.primary, borderRadius: BorderRadius.circular(20)),
+                        color: statusBackground, borderRadius: BorderRadius.circular(20)),
                     child: Text(adminStageLabel(l10n, data.stage),
-                        style: const TextStyle(
-                            color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600)),
+                        style: TextStyle(
+                            color: statusForeground, fontSize: 11, fontWeight: FontWeight.w700)),
                   ),
                 ],
               ),

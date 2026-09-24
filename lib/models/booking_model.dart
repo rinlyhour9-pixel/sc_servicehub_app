@@ -22,7 +22,7 @@ class Booking {
   final String iconAsset; // path to category icon/image
   final DateTime dateTime;
   final String address;
-  final double? latitude; // pinned location, set when the client chooses one on the map
+  final double? latitude; // Retained for bundled sample bookings.
   final double? longitude;
   final String? description; // problem description entered on the form
   final List<String> photoUrls; // uploaded photos

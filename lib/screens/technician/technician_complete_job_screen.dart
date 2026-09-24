@@ -1,7 +1,4 @@
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 
 import '../../core/app_colors.dart';
@@ -30,9 +27,6 @@ class _TechnicianCompleteJobScreenState extends State<TechnicianCompleteJobScree
   late final DateTime _endedAt = DateTime.now();
   late final TextEditingController _descriptionController =
       TextEditingController(text: widget.workNotes);
-  final _imagePicker = ImagePicker();
-  final List<Uint8List> _photos = [];
-  static const _maxPhotos = 6;
 
   @override
   void dispose() {
@@ -40,19 +34,10 @@ class _TechnicianCompleteJobScreenState extends State<TechnicianCompleteJobScree
     super.dispose();
   }
 
-  Future<void> _addPhoto() async {
-    final images = await _imagePicker.pickMultiImage(imageQuality: 80);
-    if (images.isEmpty || !mounted) return;
-
-    final remaining = _maxPhotos - _photos.length;
-    final picked = images.take(remaining);
-    final bytes = await Future.wait(picked.map((image) => image.readAsBytes()));
-    if (!mounted) return;
-
-    setState(() => _photos.addAll(bytes));
-  }
-
-  void _removePhoto(int index) => setState(() => _photos.removeAt(index));
+  void _addPhoto() => ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('Photo upload is unavailable in the static preview.')),
+      );
 
   String get _durationLabel {
     final diff = _endedAt.difference(widget.startedAt);
@@ -100,29 +85,7 @@ class _TechnicianCompleteJobScreenState extends State<TechnicianCompleteJobScree
             spacing: 10,
             runSpacing: 10,
             children: [
-              for (var i = 0; i < _photos.length; i++)
-                Stack(
-                  clipBehavior: Clip.none,
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
-                      child: Image.memory(_photos[i], width: 84, height: 84, fit: BoxFit.cover),
-                    ),
-                    Positioned(
-                      top: -6,
-                      right: -6,
-                      child: InkWell(
-                        onTap: () => _removePhoto(i),
-                        child: const CircleAvatar(
-                            radius: 10,
-                            backgroundColor: AppColors.danger,
-                            child: Icon(Icons.close, size: 13, color: Colors.white)),
-                      ),
-                    ),
-                  ],
-                ),
-              if (_photos.length < _maxPhotos)
-                InkWell(
+              InkWell(
                   onTap: _addPhoto,
                   borderRadius: BorderRadius.circular(12),
                   child: Container(

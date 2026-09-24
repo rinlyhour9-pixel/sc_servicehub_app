@@ -1,12 +1,9 @@
-import 'dart:typed_data';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:latlong2/latlong.dart';
 import '../../core/app_colors.dart';
-import '../../data/client_booking_store.dart';
+import '../../state/client_booking_store.dart';
 import '../../l10n/app_localizations.dart';
-import '../../models/service_category.dart';
 import '../../models/booking_model.dart';
+import '../../models/service_category.dart';
 import 'booking_confirmation_screen.dart';
 import 'location_picker_screen.dart';
 
@@ -41,12 +38,8 @@ class _BookingFormScreenState extends State<BookingFormScreen> {
   int _selectedTimeIndex = 1;
   TimeOfDay _selectedTime = const TimeOfDay(hour: 10, minute: 0);
   final TextEditingController _descriptionController = TextEditingController();
-  final ImagePicker _imagePicker = ImagePicker();
-  final List<Uint8List> _selectedImages = [];
-  final List<String> _photoPaths = [];
   static const _serviceAddress = '#12, Preysor, Phnom Penh';
-  static const _defaultLocation = LatLng(11.5564, 104.9282); // Phnom Penh
-  LatLng? _pickedLocation;
+  bool _submitting = false;
 
   @override
   void initState() {
@@ -60,32 +53,6 @@ class _BookingFormScreenState extends State<BookingFormScreen> {
     _descriptionController.dispose();
     _timeScrollController.dispose();
     super.dispose();
-  }
-
-  Future<void> _selectDate() async {
-    final l10n = AppLocalizations.of(context)!;
-    final today = DateTime.now();
-    final selectedDate = _dates[_selectedDateIndex];
-    final pickedDate = await showDatePicker(
-      context: context,
-      initialDate: selectedDate.isBefore(today) ? today : selectedDate,
-      firstDate: DateTime(today.year, today.month, today.day),
-      lastDate: DateTime(today.year + 1),
-      helpText: l10n.selectServiceDateHelpText,
-    );
-
-    if (pickedDate == null || !mounted) return;
-
-    setState(() {
-      _dates = [
-        pickedDate,
-        ..._dates.where((date) =>
-            date.year != pickedDate.year ||
-            date.month != pickedDate.month ||
-            date.day != pickedDate.day),
-      ].take(5).toList();
-      _selectedDateIndex = 0;
-    });
   }
 
   void _moveDateWindow(int offset) {
@@ -143,68 +110,45 @@ class _BookingFormScreenState extends State<BookingFormScreen> {
     );
   }
 
-  Future<void> _pickImages() async {
-    final images = await _imagePicker.pickMultiImage(imageQuality: 80);
-    if (images.isEmpty || !mounted) return;
-
-    final imageBytes =
-        await Future.wait(images.map((image) => image.readAsBytes()));
-    if (!mounted) return;
-
-    setState(() {
-      _selectedImages.addAll(imageBytes);
-      _photoPaths.addAll(images.map((image) => image.path));
-    });
-  }
+  void _pickImages() => ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('Photo upload is unavailable in the static preview.')),
+      );
 
   Future<void> _openLocation() async {
-    final picked = await Navigator.push<LatLng>(
+    await Navigator.push<void>(
       context,
       MaterialPageRoute(
-        builder: (_) => LocationPickerScreen(
-          initialLocation: _pickedLocation ?? _defaultLocation,
-        ),
+        builder: (_) => const LocationPickerScreen(),
       ),
     );
-    if (picked != null && mounted) {
-      setState(() => _pickedLocation = picked);
-    }
   }
 
-  void _submitBooking() {
+  Future<void> _submitBooking() async {
+    if (_submitting) return;
     final l10n = AppLocalizations.of(context)!;
     final selectedDate = _dates[_selectedDateIndex];
     final categoryName = widget.category.name(l10n);
+    setState(() => _submitting = true);
     final booking = Booking(
-      id: 'BR-${selectedDate.month.toString().padLeft(2, '0')}${selectedDate.day.toString().padLeft(2, '0')}-${DateTime.now().millisecondsSinceEpoch % 10000}',
+      id: 'DEMO-${DateTime.now().millisecondsSinceEpoch}',
       serviceName: categoryName,
-      iconAsset: categoryName,
-      dateTime: DateTime(
-        selectedDate.year,
-        selectedDate.month,
-        selectedDate.day,
-        _selectedTime.hour,
-        _selectedTime.minute,
-      ),
+      iconAsset: widget.category.id.name,
+      dateTime: DateTime(selectedDate.year, selectedDate.month,
+          selectedDate.day, _selectedTime.hour, _selectedTime.minute),
       address: _serviceAddress,
-      latitude: _pickedLocation?.latitude,
-      longitude: _pickedLocation?.longitude,
-      description: _descriptionController.text.trim().isEmpty
-          ? l10n.noDescriptionProvided
-          : _descriptionController.text.trim(),
-      photoUrls: _photoPaths,
+      description: _descriptionController.text.trim(),
       status: BookingStatus.pending,
-      timeline: [
-        BookingStatusStep(
-            label: l10n.bookingConfirmedStep, isDone: true, isCurrent: true),
-        BookingStatusStep(label: l10n.technicianAssignedLabel),
-        BookingStatusStep(label: l10n.serviceInProcessStep),
-        BookingStatusStep(label: l10n.serviceCompleteStep),
+      timeline: const [
+        BookingStatusStep(label: 'Booking Confirmed', isDone: true, isCurrent: true),
+        BookingStatusStep(label: 'Technician Assigned'),
+        BookingStatusStep(label: 'Service in Process'),
+        BookingStatusStep(label: 'Service Complete'),
       ],
     );
-
     ClientBookingStore.instance.addBooking(booking);
-
+    if (!mounted) return;
+    setState(() => _submitting = false);
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -529,12 +473,9 @@ class _BookingFormScreenState extends State<BookingFormScreen> {
                               style:
                                   const TextStyle(fontWeight: FontWeight.bold)),
                           const SizedBox(height: 2),
-                          Text(
-                            _pickedLocation == null
-                                ? _serviceAddress
-                                : '${l10n.pinnedPrefix}${_pickedLocation!.latitude.toStringAsFixed(5)}, '
-                                    '${_pickedLocation!.longitude.toStringAsFixed(5)}',
-                            style: const TextStyle(
+                          const Text(
+                            _serviceAddress,
+                            style: TextStyle(
                                 fontSize: 12, color: AppColors.textSecondary),
                           ),
                         ],
@@ -608,45 +549,6 @@ class _BookingFormScreenState extends State<BookingFormScreen> {
                         color: AppColors.primary),
                   ),
                 ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: SizedBox(
-                    height: 64,
-                    child: ListView.separated(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: _selectedImages.length,
-                      separatorBuilder: (_, __) => const SizedBox(width: 10),
-                      itemBuilder: (context, index) => Stack(
-                        clipBehavior: Clip.none,
-                        children: [
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(12),
-                            child: Image.memory(_selectedImages[index],
-                                width: 64, height: 64, fit: BoxFit.cover),
-                          ),
-                          Positioned(
-                            top: 0,
-                            right: 0,
-                            child: Transform.translate(
-                              offset: const Offset(7, -7),
-                              child: InkWell(
-                                onTap: () => setState(() {
-                                  _selectedImages.removeAt(index);
-                                  _photoPaths.removeAt(index);
-                                }),
-                                child: const CircleAvatar(
-                                    radius: 10,
-                                    backgroundColor: AppColors.danger,
-                                    child: Icon(Icons.close,
-                                        size: 13, color: Colors.white)),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
               ],
             ),
           ),
@@ -676,8 +578,8 @@ class _BookingFormScreenState extends State<BookingFormScreen> {
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16)),
             ),
-            onPressed: _submitBooking,
-            child: Text(l10n.bookingNowButton,
+            onPressed: _submitting ? null : _submitBooking,
+            child: Text(_submitting ? 'Sending...' : l10n.bookingNowButton,
                 style: const TextStyle(
                     color: Colors.white,
                     fontSize: 16,

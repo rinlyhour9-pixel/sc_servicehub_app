@@ -48,14 +48,19 @@ class ProfileScreen extends StatelessWidget {
           width: double.infinity,
           padding: const EdgeInsets.fromLTRB(20, 16, 20, 28),
           decoration: const BoxDecoration(
-            color: AppColors.primary,
+            gradient: LinearGradient(
+              colors: [AppColors.primary, AppColors.primaryDark],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
             borderRadius: BorderRadius.vertical(bottom: Radius.circular(24)),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(l10n.myProfileTitle, style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
-              Text(l10n.myProfileSubtitle, style: const TextStyle(color: Colors.white70)),
+              Text(l10n.myProfileTitle, style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w700)),
+              const SizedBox(height: 4),
+              Text(l10n.myProfileSubtitle, style: const TextStyle(color: Colors.white70, height: 1.35)),
             ],
           ),
         ),
@@ -66,10 +71,15 @@ class ProfileScreen extends StatelessWidget {
             children: [
               _ProfileCard(),
               const SizedBox(height: 20),
-              Text(l10n.accountSettings, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              Text(l10n.accountSettings, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
               const SizedBox(height: 10),
               Container(
-                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(18)),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(18),
+                  border: Border.all(color: AppColors.border),
+                  boxShadow: const [BoxShadow(color: Color(0x080B5FA8), blurRadius: 14, offset: Offset(0, 5))],
+                ),
                 child: Column(
                   children: [
                     _SettingsTile(
@@ -137,10 +147,14 @@ class _ProfileCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(18)),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: AppColors.border),
+      ),
       child: const Row(
         children: [
-          CircleAvatar(radius: 30, backgroundColor: AppColors.primaryDark, child: Text('SC', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold))),
+          CircleAvatar(radius: 30, backgroundColor: AppColors.primary, child: Text('SC', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold))),
           SizedBox(width: 14),
           Expanded(
             child: Column(
@@ -178,11 +192,13 @@ class _SettingsTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 3),
+      minVerticalPadding: 12,
       onTap: onTap,
       leading: CircleAvatar(backgroundColor: iconBg, foregroundColor: iconColor, child: Icon(icon, size: 20)),
       title: Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
       subtitle: Text(subtitle, style: const TextStyle(fontSize: 12)),
-      trailing: const Icon(Icons.chevron_right, size: 20),
+      trailing: const Icon(Icons.chevron_right_rounded, size: 20, color: AppColors.textSecondary),
     );
   }
 }

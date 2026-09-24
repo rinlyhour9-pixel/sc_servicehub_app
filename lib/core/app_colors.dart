@@ -10,6 +10,7 @@ class AppColors {
   static const Color primary = Color(0xFF0B5FA8);
   static const Color primaryDark = Color(0xFF08497F);
   static const Color primaryLight = Color(0xFFDCEBFB);
+  static const Color primarySoft = Color(0xFFF1F7FE);
   static const Color background = Color(0xFFF3F5F7);
   static const Color card = Color(0xFFFFFFFF);
   static const Color surface = Color(0xFFFFFFFF);
@@ -19,6 +20,10 @@ class AppColors {
   static const Color textSecondary = Color(0xFF7A7F87);
   static const Color pendingBg = Color(0xFFDCEBFB);
   static const Color pendingText = Color(0xFF0B5FA8);
+  static const Color warning = Color(0xFFE2711D);
+  static const Color warningBg = Color(0xFFFFF1E5);
   static const Color danger = Color(0xFFE24C4B);
+  static const Color dangerBg = Color(0xFFFFECEB);
   static const Color success = Color(0xFF2FB673);
+  static const Color successBg = Color(0xFFE8F7EF);
 }

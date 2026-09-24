@@ -31,8 +31,10 @@ class AppBottomNav extends StatelessWidget {
     return BottomAppBar(
       color: Colors.white,
       padding: EdgeInsets.zero,
+      elevation: 8,
+      surfaceTintColor: Colors.white,
       child: SizedBox(
-        height: 72,
+        height: 76,
         child: Row(
           children: List.generate(items.length, (index) {
             final selected = index == currentIndex;
@@ -40,32 +42,34 @@ class AppBottomNav extends StatelessWidget {
             return Expanded(
               child: InkWell(
                 onTap: () => onTap(index),
+                borderRadius: BorderRadius.circular(16),
                 child: Stack(
                   alignment: Alignment.center,
                   children: [
                     Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Container(
-                          padding: const EdgeInsets.all(7),
+                        AnimatedContainer(
+                          duration: const Duration(milliseconds: 180),
+                          padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
-                            color: selected ? AppColors.primary : Colors.transparent,
-                            shape: BoxShape.circle,
+                            color: selected ? AppColors.primary : AppColors.primarySoft,
+                            borderRadius: BorderRadius.circular(14),
                           ),
                           child: Icon(
                             item.icon,
-                            color: selected ? Colors.white : AppColors.textSecondary,
+                            color: selected ? Colors.white : AppColors.primary,
                           ),
                         ),
-                        const SizedBox(height: 2),
+                        const SizedBox(height: 4),
                         Text(item.label, style: TextStyle(fontSize: 11, fontWeight: selected ? FontWeight.w700 : FontWeight.w500, color: selected ? AppColors.primary : AppColors.textSecondary)),
                       ],
                     ),
                     if (item.dot)
                       const Positioned(
-                        top: 8,
+                        top: 12,
                         right: 28,
-                        child: CircleAvatar(radius: 4, backgroundColor: AppColors.primary),
+                        child: CircleAvatar(radius: 4, backgroundColor: AppColors.danger),
                       ),
                   ],
                 ),

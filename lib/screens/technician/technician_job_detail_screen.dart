@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/app_assets.dart';
 import '../../core/app_colors.dart';
@@ -7,24 +6,9 @@ import '../../l10n/app_localizations.dart';
 import '../../models/technician_job.dart';
 import 'technician_job_in_progress_screen.dart';
 
-Future<void> _openJobLocation(BuildContext context, TechnicianJob job) async {
+void _openJobLocation(BuildContext context, TechnicianJob job) {
   final l10n = AppLocalizations.of(context)!;
-  final hasPin = job.latitude != null && job.longitude != null;
-  final mapUrl = hasPin
-      ? Uri.https('www.google.com', '/maps/search/', {
-          'api': '1',
-          'query': '${job.latitude},${job.longitude}',
-        })
-      : Uri.https('www.google.com', '/maps/search/', {
-          'api': '1',
-          'query': job.address,
-        });
-  final opened = await launchUrl(mapUrl, mode: LaunchMode.externalApplication);
-  if (!opened && context.mounted) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(l10n.unableOpenMap)),
-    );
-  }
+  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.unableOpenMap)));
 }
 
 class TechnicianJobDetailScreen extends StatelessWidget {

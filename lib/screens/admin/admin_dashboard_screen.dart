@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../core/app_colors.dart';
 import '../../core/status_labels.dart';
-import '../../data/admin_booking_store.dart';
+import '../../state/admin_booking_store.dart';
 import '../../l10n/app_localizations.dart';
 import '../../models/admin_booking_entry.dart';
 import '../../models/technician_profile.dart';
@@ -160,7 +160,10 @@ class AdminDashboardScreen extends StatelessWidget {
         const SizedBox(height: 8),
         Container(
           decoration: BoxDecoration(
-              color: Colors.white, borderRadius: BorderRadius.circular(18)),
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(color: AppColors.border),
+              boxShadow: const [BoxShadow(color: Color(0x080B5FA8), blurRadius: 12, offset: Offset(0, 4))]),
           child: schedule.isEmpty
               ? Padding(
                   padding: const EdgeInsets.all(20),
@@ -190,7 +193,10 @@ class AdminDashboardScreen extends StatelessWidget {
         const SizedBox(height: 8),
         Container(
           decoration: BoxDecoration(
-              color: Colors.white, borderRadius: BorderRadius.circular(18)),
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(color: AppColors.border),
+              boxShadow: const [BoxShadow(color: Color(0x080B5FA8), blurRadius: 12, offset: Offset(0, 4))]),
           child: Column(
             children: List.generate(recentActivity.length * 2 - 1, (index) {
               if (index.isOdd) return const Divider(height: 1);
@@ -224,6 +230,7 @@ class _StatCard extends StatelessWidget {
             offset: const Offset(0, 6),
           ),
         ],
+        border: Border.all(color: AppColors.border),
       ),
       child: Material(
         color: Colors.transparent,
@@ -236,14 +243,20 @@ class _StatCard extends StatelessWidget {
             child: Row(
               children: [
                 Container(
-                  width: 46,
-                  height: 46,
+                  width: 52,
+                  height: 52,
+                  clipBehavior: Clip.antiAlias,
                   decoration: BoxDecoration(
-                    color: data.color.withValues(alpha: .12),
-                    borderRadius: BorderRadius.circular(13),
+                    // Dashboard artwork includes a light, opaque background.
+                    // Match it here so the image reads as one rounded icon
+                    // surface instead of a white square in a colored block.
+                    color: const Color(0xFFFCFBF8),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: AppColors.border.withValues(alpha: 0.55),
+                    ),
                   ),
-                  padding: const EdgeInsets.all(8),
-                  child: Image.asset(data.iconAsset, fit: BoxFit.contain),
+                  child: Image.asset(data.iconAsset, fit: BoxFit.cover),
                 ),
                 const SizedBox(width: 12),
                 Expanded(

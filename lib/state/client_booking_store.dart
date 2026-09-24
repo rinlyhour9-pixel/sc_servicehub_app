@@ -10,7 +10,7 @@ class ClientBookingStore extends ChangeNotifier {
   ClientBookingStore._internal();
   static final ClientBookingStore instance = ClientBookingStore._internal();
 
-  // TODO: replace with data from your booking API/service layer.
+  // In-memory sample content for the static preview.
   final List<Booking> upcoming = [
     Booking(
       id: 'BR-240521-1287',
@@ -24,8 +24,15 @@ class ClientBookingStore extends ChangeNotifier {
       technicianName: 'Sokun Therayuk',
       technicianPhone: '010314240',
       timeline: const [
-        BookingStatusStep(label: 'Booking Confirmed', timestamp: '20 May 2024, 02:30 PM', isDone: true),
-        BookingStatusStep(label: 'Technician Assigned', timestamp: '20 May 2024, 04:30 PM', isDone: true, isCurrent: true),
+        BookingStatusStep(
+            label: 'Booking Confirmed',
+            timestamp: '20 May 2024, 02:30 PM',
+            isDone: true),
+        BookingStatusStep(
+            label: 'Technician Assigned',
+            timestamp: '20 May 2024, 04:30 PM',
+            isDone: true,
+            isCurrent: true),
         BookingStatusStep(label: 'Service in Process', timestamp: 'Pending'),
         BookingStatusStep(label: 'Service Complete', timestamp: 'Pending'),
       ],
@@ -39,7 +46,8 @@ class ClientBookingStore extends ChangeNotifier {
       description: 'Kitchen sink is leaking under the cabinet',
       status: BookingStatus.pending,
       timeline: const [
-        BookingStatusStep(label: 'Booking Confirmed', isDone: true, isCurrent: true),
+        BookingStatusStep(
+            label: 'Booking Confirmed', isDone: true, isCurrent: true),
         BookingStatusStep(label: 'Technician Assigned'),
         BookingStatusStep(label: 'Service in Process'),
         BookingStatusStep(label: 'Service Complete'),
@@ -59,10 +67,22 @@ class ClientBookingStore extends ChangeNotifier {
       technicianName: 'Dara Vong',
       technicianPhone: '098765432',
       timeline: const [
-        BookingStatusStep(label: 'Booking Confirmed', timestamp: '01 Apr 2024, 09:00 AM', isDone: true),
-        BookingStatusStep(label: 'Technician Assigned', timestamp: '01 Apr 2024, 10:00 AM', isDone: true),
-        BookingStatusStep(label: 'Service in Process', timestamp: '01 Apr 2024, 11:00 AM', isDone: true),
-        BookingStatusStep(label: 'Service Complete', timestamp: '01 Apr 2024, 01:00 PM', isDone: true),
+        BookingStatusStep(
+            label: 'Booking Confirmed',
+            timestamp: '01 Apr 2024, 09:00 AM',
+            isDone: true),
+        BookingStatusStep(
+            label: 'Technician Assigned',
+            timestamp: '01 Apr 2024, 10:00 AM',
+            isDone: true),
+        BookingStatusStep(
+            label: 'Service in Process',
+            timestamp: '01 Apr 2024, 11:00 AM',
+            isDone: true),
+        BookingStatusStep(
+            label: 'Service Complete',
+            timestamp: '01 Apr 2024, 01:00 PM',
+            isDone: true),
       ],
     ),
   ];

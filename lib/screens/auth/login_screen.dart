@@ -31,6 +31,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
   bool _rememberMe = true;
+  bool _submitting = false;
 
   @override
   void dispose() {
@@ -39,11 +40,18 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  void _signIn() {
-    if (_formKey.currentState!.validate()) widget.onAuthenticated();
+  Future<void> _signIn() async {
+    if (!_formKey.currentState!.validate() || _submitting) return;
+    setState(() => _submitting = true);
+    // Static preview: validation is local and no account is sent or saved.
+    if (mounted) {
+      setState(() => _submitting = false);
+      widget.onAuthenticated();
+    }
   }
 
-  (IconData, String, String) _roleContent(AppLocalizations l10n) => switch (widget.role) {
+  (IconData, String, String) _roleContent(AppLocalizations l10n) =>
+      switch (widget.role) {
         UserRole.client => (
             Icons.handyman_rounded,
             l10n.loginWelcomeTitle,
@@ -82,7 +90,9 @@ class _LoginScreenState extends State<LoginScreen> {
               hint: l10n.phoneNumberHint,
               icon: Icons.phone_outlined,
               keyboardType: TextInputType.phone,
-              validator: (value) => value == null || value.trim().length < 8 ? l10n.validatorPhoneInvalid : null,
+              validator: (value) => value == null || value.trim().length < 8
+                  ? l10n.validatorPhoneInvalid
+                  : null,
             ),
             const SizedBox(height: 18),
             AuthField(
@@ -92,31 +102,50 @@ class _LoginScreenState extends State<LoginScreen> {
               icon: Icons.lock_outline,
               obscureText: _obscurePassword,
               suffixIcon: IconButton(
-                onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
-                icon: Icon(_obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined),
+                onPressed: () =>
+                    setState(() => _obscurePassword = !_obscurePassword),
+                icon: Icon(_obscurePassword
+                    ? Icons.visibility_outlined
+                    : Icons.visibility_off_outlined),
               ),
-              validator: (value) => value == null || value.length < 6 ? l10n.validatorPasswordMinLength : null,
+              validator: (value) => value == null || value.length < 6
+                  ? l10n.validatorPasswordMinLength
+                  : null,
             ),
             const SizedBox(height: 8),
             Row(
               children: [
-                Checkbox(value: _rememberMe, activeColor: AppColors.primary, onChanged: (value) => setState(() => _rememberMe = value ?? false)),
+                Checkbox(
+                    value: _rememberMe,
+                    activeColor: AppColors.primary,
+                    onChanged: (value) =>
+                        setState(() => _rememberMe = value ?? false)),
                 Text(l10n.rememberMe, style: const TextStyle(fontSize: 13)),
                 const Spacer(),
                 TextButton(
-                  onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ForgotPasswordScreen())),
+                  onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => const ForgotPasswordScreen())),
                   child: Text(l10n.forgotPassword),
                 ),
               ],
             ),
             const SizedBox(height: 20),
-            PrimaryAuthButton(label: l10n.signIn, onPressed: _signIn),
+            PrimaryAuthButton(
+              label: _submitting ? 'Signing in...' : l10n.signIn,
+              onPressed: _submitting ? () {} : _signIn,
+            ),
             if (widget.showCreateAccount) ...[
               const SizedBox(height: 24),
               Row(
                 children: [
                   const Expanded(child: Divider()),
-                  Padding(padding: const EdgeInsets.symmetric(horizontal: 14), child: Text(l10n.or, style: TextStyle(fontSize: 12, color: Colors.grey.shade600))),
+                  Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 14),
+                      child: Text(l10n.or,
+                          style: TextStyle(
+                              fontSize: 12, color: Colors.grey.shade600))),
                   const Expanded(child: Divider()),
                 ],
               ),
@@ -125,9 +154,14 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Wrap(
                   crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
-                    Text(l10n.newToApp, style: const TextStyle(color: AppColors.textSecondary)),
+                    Text(l10n.newToApp,
+                        style: const TextStyle(color: AppColors.textSecondary)),
                     TextButton(
-                      onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => SignUpScreen(onAuthenticated: widget.onAuthenticated))),
+                      onPressed: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (_) => SignUpScreen(
+                                  onAuthenticated: widget.onAuthenticated))),
                       child: Text(l10n.createAnAccount),
                     ),
                   ],

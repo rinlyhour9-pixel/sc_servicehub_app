@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:url_launcher/url_launcher.dart';
 import '../../core/app_colors.dart';
 import '../../l10n/app_localizations.dart';
 import '../../models/booking_model.dart';
@@ -9,24 +8,9 @@ class BookingDetailScreen extends StatelessWidget {
   final Booking booking;
   const BookingDetailScreen({super.key, required this.booking});
 
-  Future<void> _openMap(BuildContext context) async {
+  void _showAddress(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final hasPin = booking.latitude != null && booking.longitude != null;
-    final mapUrl = hasPin
-        ? Uri.https('www.google.com', '/maps/search/', {
-            'api': '1',
-            'query': '${booking.latitude},${booking.longitude}',
-          })
-        : Uri.https('www.google.com', '/maps/search/', {
-            'api': '1',
-            'query': booking.address,
-          });
-    final opened = await launchUrl(mapUrl, mode: LaunchMode.externalApplication);
-    if (!opened && context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.unableOpenMap)),
-      );
-    }
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.unableOpenMap)));
   }
 
   @override
@@ -37,6 +21,13 @@ class BookingDetailScreen extends StatelessWidget {
     // Demo technician if the booking hasn't been assigned one yet.
     final techName = booking.technicianName ?? 'Sokun Therayuk';
     final techPhone = booking.technicianPhone ?? '010314240';
+    final statusLabel = switch (booking.status) {
+      BookingStatus.pending => l10n.statusPending,
+      BookingStatus.accepted => l10n.statusAccepted,
+      BookingStatus.inProgress => l10n.statusInProgress,
+      BookingStatus.completed => l10n.statusCompleted,
+      BookingStatus.cancelled => l10n.statusCancelled,
+    };
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -48,11 +39,15 @@ class BookingDetailScreen extends StatelessWidget {
         centerTitle: true,
       ),
       body: ListView(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
+        padding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
         children: [
           Container(
             padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(color: AppColors.primary, borderRadius: BorderRadius.circular(16)),
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(colors: [AppColors.primary, AppColors.primaryDark], begin: Alignment.topLeft, end: Alignment.bottomRight),
+              borderRadius: BorderRadius.circular(18),
+              boxShadow: [BoxShadow(color: AppColors.primary.withValues(alpha: .25), blurRadius: 16, offset: const Offset(0, 7))],
+            ),
             child: Row(
               children: [
                 const CircleAvatar(backgroundColor: Colors.white24, child: Icon(Icons.ac_unit, color: Colors.white, size: 20)),
@@ -66,6 +61,11 @@ class BookingDetailScreen extends StatelessWidget {
                     ],
                   ),
                 ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  decoration: const BoxDecoration(color: Color(0x33FFFFFF), borderRadius: BorderRadius.all(Radius.circular(20))),
+                  child: Text(statusLabel, style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700)),
+                ),
               ],
             ),
           ),
@@ -77,7 +77,7 @@ class BookingDetailScreen extends StatelessWidget {
             label: l10n.labelAddress,
             value: booking.address,
             trailing: const Icon(Icons.navigation_outlined, color: AppColors.primary, size: 20),
-            onTap: () => _openMap(context),
+            onTap: () => _showAddress(context),
           ),
           _InfoRow(icon: Icons.description_outlined, label: l10n.labelDescription, value: booking.description ?? '-'),
           _InfoRow(icon: Icons.photo_library_outlined, label: l10n.photoLabel, value: l10n.photosCountSuffix(booking.photoUrls.length)),
@@ -109,7 +109,7 @@ class BookingDetailScreen extends StatelessWidget {
           const SizedBox(height: 18),
           Container(
             padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(color: AppColors.tileBackground, borderRadius: BorderRadius.circular(16)),
+            decoration: BoxDecoration(color: AppColors.tileBackground, borderRadius: BorderRadius.circular(16), border: Border.all(color: AppColors.primaryLight)),
             child: Row(
               children: [
                 const CircleAvatar(radius: 24, backgroundColor: AppColors.primary, child: Icon(Icons.person, color: Colors.white, size: 24)),
@@ -131,7 +131,7 @@ class BookingDetailScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 20),
-          Text(l10n.bookingStatusTitle, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+          Text(l10n.bookingStatusTitle, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
           const SizedBox(height: 14),
           _StatusTimeline(steps: booking.timeline),
           const SizedBox(height: 20),
@@ -145,8 +145,9 @@ class BookingDetailScreen extends StatelessWidget {
           const SizedBox(height: 20),
         ],
       ),
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+      bottomNavigationBar: Container(
+        padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+        decoration: const BoxDecoration(color: AppColors.background, boxShadow: [BoxShadow(color: Color(0x10000000), blurRadius: 14, offset: Offset(0, -4))]),
         child: SizedBox(
           width: double.infinity,
           height: 52,
@@ -155,7 +156,9 @@ class BookingDetailScreen extends StatelessWidget {
               backgroundColor: AppColors.primary,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
             ),
-            onPressed: null,
+            onPressed: () => ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Booking status is shown in this static preview.')),
+            ),
             child: Text(l10n.technicianAssignedLabel, style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
           ),
         ),

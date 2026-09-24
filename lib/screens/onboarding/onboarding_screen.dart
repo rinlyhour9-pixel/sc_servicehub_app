@@ -16,7 +16,7 @@ class OnboardingScreen extends StatefulWidget {
 }
 
 class _OnboardingScreenState extends State<OnboardingScreen> {
-  static const _progressColor = Color(0xFF8BC34A);
+  static const _progressColor = AppColors.primary;
   static const _autoAdvanceInterval = Duration(seconds: 2);
 
   final _controller = PageController();
@@ -142,8 +142,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         backgroundColor: AppColors.primary,
                         foregroundColor: Colors.white,
                         elevation: 0,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14)),
+                      shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16)),
                       ),
                       child: Text(_isLastPage ? l10n.getStarted : l10n.next,
                           style: const TextStyle(
@@ -195,7 +195,7 @@ class _OnboardingPage extends StatelessWidget {
                 pageCount,
                 (index) => AnimatedContainer(
                       duration: const Duration(milliseconds: 220),
-                      width: index == currentPage ? 32 : 22,
+                      width: index == currentPage ? 28 : 8,
                       height: 6,
                       margin: const EdgeInsets.symmetric(horizontal: 3),
                       decoration: BoxDecoration(

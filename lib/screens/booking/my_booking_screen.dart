@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../core/app_colors.dart';
-import '../../data/client_booking_store.dart';
+import '../../state/client_booking_store.dart';
 import '../../l10n/app_localizations.dart';
 import '../../widgets/booking_card.dart';
 import 'booking_detail_screen.dart';
@@ -35,7 +35,11 @@ class _MyBookingScreenState extends State<MyBookingScreen> {
           width: double.infinity,
           padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
           decoration: const BoxDecoration(
-            color: AppColors.primary,
+            gradient: LinearGradient(
+              colors: [AppColors.primary, AppColors.primaryDark],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
             borderRadius: BorderRadius.vertical(bottom: Radius.circular(24)),
           ),
           child: Column(
@@ -45,9 +49,10 @@ class _MyBookingScreenState extends State<MyBookingScreen> {
                   style: const TextStyle(
                       color: Colors.white,
                       fontSize: 24,
-                      fontWeight: FontWeight.bold)),
+                      fontWeight: FontWeight.w700)),
+              const SizedBox(height: 4),
               Text(l10n.viewServiceBookingSubtitle,
-                  style: const TextStyle(color: Colors.white70)),
+                  style: const TextStyle(color: Colors.white70, height: 1.35)),
             ],
           ),
         ),
@@ -60,24 +65,39 @@ class _MyBookingScreenState extends State<MyBookingScreen> {
                 const SizedBox(height: 20),
                 Row(
                   children: [
-                    _TabButton(label: l10n.upcomingTab, selected: showUpcoming, onTap: () => setState(() => showUpcoming = true)),
+                    _TabButton(
+                        label: l10n.upcomingTab,
+                        selected: showUpcoming,
+                        onTap: () => setState(() => showUpcoming = true)),
                     const SizedBox(width: 12),
-                    _TabButton(label: l10n.historyTab, selected: !showUpcoming, onTap: () => setState(() => showUpcoming = false)),
+                    _TabButton(
+                        label: l10n.historyTab,
+                        selected: !showUpcoming,
+                        onTap: () => setState(() => showUpcoming = false)),
                   ],
                 ),
                 const SizedBox(height: 20),
-                Text(showUpcoming ? l10n.upcomingBookingsTitle : l10n.pastBookingsTitle, style: Theme.of(context).textTheme.titleMedium),
+                Text(
+                    showUpcoming
+                        ? l10n.upcomingBookingsTitle
+                        : l10n.pastBookingsTitle,
+                    style: Theme.of(context).textTheme.titleMedium),
                 const SizedBox(height: 12),
                 Expanded(
                   child: list.isEmpty
-                      ? Center(child: Text(l10n.noBookingsYet, style: const TextStyle(color: AppColors.textSecondary)))
+                      ? Center(
+                          child: Text(l10n.noBookingsYet,
+                              style: const TextStyle(
+                                  color: AppColors.textSecondary)))
                       : ListView.builder(
                           itemCount: list.length,
                           itemBuilder: (context, i) => BookingCard(
                             booking: list[i],
                             onTap: () => Navigator.push(
                               context,
-                              MaterialPageRoute(builder: (_) => BookingDetailScreen(booking: list[i])),
+                              MaterialPageRoute(
+                                  builder: (_) =>
+                                      BookingDetailScreen(booking: list[i])),
                             ),
                           ),
                         ),
@@ -95,7 +115,8 @@ class _TabButton extends StatelessWidget {
   final String label;
   final bool selected;
   final VoidCallback onTap;
-  const _TabButton({required this.label, required this.selected, required this.onTap});
+  const _TabButton(
+      {required this.label, required this.selected, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -103,17 +124,24 @@ class _TabButton extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(24),
-        child: Container(
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
           padding: const EdgeInsets.symmetric(vertical: 12),
           decoration: BoxDecoration(
             color: selected ? AppColors.primary : Colors.white,
             borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: selected ? AppColors.primary : Colors.grey.shade300),
+            border: Border.all(
+                color: selected ? AppColors.primary : AppColors.border),
+            boxShadow: selected
+                ? [BoxShadow(color: AppColors.primary.withValues(alpha: .18), blurRadius: 10, offset: const Offset(0, 4))]
+                : null,
           ),
           child: Text(
             label,
             textAlign: TextAlign.center,
-            style: TextStyle(color: selected ? Colors.white : AppColors.textPrimary, fontWeight: FontWeight.w600),
+            style: TextStyle(
+                color: selected ? Colors.white : AppColors.textPrimary,
+                fontWeight: FontWeight.w700),
           ),
         ),
       ),

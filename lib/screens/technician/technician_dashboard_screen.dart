@@ -26,7 +26,7 @@ class _TechnicianDashboardScreenState extends State<TechnicianDashboardScreen> {
         _TaskShortcut(iconAsset: 'assets/technician_icon/completed_icon.png', label: l10n.completedAllCaps),
       ];
 
-  // TODO: replace with data from your technician task API.
+  // Bundled sample tasks for the static preview.
   final List<TechnicianJob> _assignedTasks = [
     const TechnicianJob(
       icon: Icons.ac_unit_rounded,
@@ -200,26 +200,46 @@ class _TaskShortcutTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: AppColors.tileBackground,
+      color: Colors.white,
       borderRadius: BorderRadius.circular(16),
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(16),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 8),
-          child: Column(
-            children: [
-              Image.asset(data.iconAsset, width: 34, height: 34),
-              const SizedBox(height: 10),
-              Text(data.label,
-                  textAlign: TextAlign.center,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.textPrimary)),
-            ],
+        child: Ink(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: AppColors.border),
+            boxShadow: const [BoxShadow(color: Color(0x080B5FA8), blurRadius: 10, offset: Offset(0, 4))],
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+            child: Column(
+              children: [
+                Container(
+                  width: 58,
+                  height: 58,
+                  clipBehavior: Clip.antiAlias,
+                  decoration: BoxDecoration(
+                    // Keep the artwork's opaque background visually seamless.
+                    color: const Color(0xFFFCFBF8),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: AppColors.border.withValues(alpha: 0.55),
+                    ),
+                  ),
+                  child: Image.asset(data.iconAsset, fit: BoxFit.cover),
+                ),
+                const SizedBox(height: 10),
+                Text(data.label,
+                    textAlign: TextAlign.center,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textPrimary)),
+              ],
+            ),
           ),
         ),
       ),
@@ -243,6 +263,7 @@ class _AssignedTaskCard extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
         border: Border.all(color: AppColors.border),
+        boxShadow: const [BoxShadow(color: Color(0x080B5FA8), blurRadius: 12, offset: Offset(0, 4))],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

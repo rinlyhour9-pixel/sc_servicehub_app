@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'core/app_theme.dart';
 import 'l10n/app_localizations.dart';
 import 'models/user_role.dart';
@@ -22,27 +21,9 @@ class SoftCreativeApp extends StatefulWidget {
 }
 
 class _SoftCreativeAppState extends State<SoftCreativeApp> {
-  static const _localeKey = 'app_locale';
-
   Locale _locale = const Locale('en');
 
-  @override
-  void initState() {
-    super.initState();
-    _loadLocale();
-  }
-
-  Future<void> _loadLocale() async {
-    final prefs = await SharedPreferences.getInstance();
-    final code = prefs.getString(_localeKey);
-    if (mounted && code != null) setState(() => _locale = Locale(code));
-  }
-
-  Future<void> _changeLocale(Locale locale) async {
-    setState(() => _locale = locale);
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_localeKey, locale.languageCode);
-  }
+  void _changeLocale(Locale locale) => setState(() => _locale = locale);
 
   @override
   Widget build(BuildContext context) {
@@ -74,29 +55,11 @@ class _AppShell extends StatefulWidget {
 }
 
 class _AppShellState extends State<_AppShell> {
-  static const _hasSeenOnboardingKey = 'has_seen_onboarding';
-
   bool _isAuthenticated = false;
   bool _hasSeenOnboarding = false;
   UserRole? _selectedRole;
 
-  @override
-  void initState() {
-    super.initState();
-    _loadOnboardingState();
-  }
-
-  Future<void> _loadOnboardingState() async {
-    final prefs = await SharedPreferences.getInstance();
-    final seen = prefs.getBool(_hasSeenOnboardingKey) ?? false;
-    if (mounted && seen) setState(() => _hasSeenOnboarding = true);
-  }
-
-  Future<void> _completeOnboarding() async {
-    setState(() => _hasSeenOnboarding = true);
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(_hasSeenOnboardingKey, true);
-  }
+  void _completeOnboarding() => setState(() => _hasSeenOnboarding = true);
 
   @override
   Widget build(BuildContext context) {
@@ -119,10 +82,7 @@ class _AppShellState extends State<_AppShell> {
       return AdminNavigation(
         locale: widget.locale,
         onLocaleChanged: widget.onLocaleChanged,
-        onLogout: () => setState(() {
-          _isAuthenticated = false;
-          _selectedRole = null;
-        }),
+        onLogout: _logout,
       );
     }
     if (_selectedRole == UserRole.technician) {
@@ -137,10 +97,7 @@ class _AppShellState extends State<_AppShell> {
       return TechnicianNavigation(
         locale: widget.locale,
         onLocaleChanged: widget.onLocaleChanged,
-        onLogout: () => setState(() {
-          _isAuthenticated = false;
-          _selectedRole = null;
-        }),
+        onLogout: _logout,
       );
     }
     if (!_hasSeenOnboarding) {
@@ -155,10 +112,14 @@ class _AppShellState extends State<_AppShell> {
     return MainNavigation(
       locale: widget.locale,
       onLocaleChanged: widget.onLocaleChanged,
-      onLogout: () => setState(() {
-        _isAuthenticated = false;
-        _selectedRole = null;
-      }),
+      onLogout: _logout,
     );
+  }
+
+  void _logout() {
+    setState(() {
+      _isAuthenticated = false;
+      _selectedRole = null;
+    });
   }
 }

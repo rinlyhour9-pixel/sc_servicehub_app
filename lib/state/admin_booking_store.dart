@@ -12,7 +12,7 @@ class AdminBookingStore extends ChangeNotifier {
   AdminBookingStore._internal();
   static final AdminBookingStore instance = AdminBookingStore._internal();
 
-  // TODO: replace with data from your admin/reporting API.
+  // In-memory sample content for the static preview.
   final List<AdminBookingEntry> bookings = [
     AdminBookingEntry(
       id: '#BK240520001',

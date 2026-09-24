@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../../core/app_colors.dart';
-import '../../data/admin_booking_store.dart';
+import '../../state/admin_booking_store.dart';
 import '../../l10n/app_localizations.dart';
 import '../../models/admin_booking_entry.dart';
 import 'admin_track_booking_screen.dart';

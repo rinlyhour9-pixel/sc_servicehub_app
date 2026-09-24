@@ -25,7 +25,7 @@ class TechnicianProfile {
 
   String get skillSummary => skills.join(', ');
 
-  // TODO: replace with data from your technician management API.
+  // Bundled sample technician directory for the static preview.
   static const List<TechnicianProfile> demoDirectory = [
     TechnicianProfile(
       name: 'Sok Dara',
