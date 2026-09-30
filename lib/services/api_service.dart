@@ -208,7 +208,7 @@ class ApiService {
   }) async {
     final fields = <String, String>{
       'service_id': serviceId.toString(),
-      'scheduled_at': scheduledAt.toIso8601String(),
+      'scheduled_at': scheduledAt.toUtc().toIso8601String(),
       'address': address,
       if (description.trim().isNotEmpty) 'description': description.trim(),
     };
