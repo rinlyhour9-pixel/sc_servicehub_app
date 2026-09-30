@@ -224,6 +224,24 @@ abstract class AppLocalizations {
   /// **'+855 12 345 678'**
   String get phoneNumberHint;
 
+  /// No description provided for @emailAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'Email address'**
+  String get emailAddress;
+
+  /// No description provided for @emailAddressHint.
+  ///
+  /// In en, this message translates to:
+  /// **'name@example.com'**
+  String get emailAddressHint;
+
+  /// No description provided for @validatorEmailInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid email address.'**
+  String get validatorEmailInvalid;
+
   /// No description provided for @password.
   ///
   /// In en, this message translates to:
@@ -329,7 +347,7 @@ abstract class AppLocalizations {
   /// No description provided for @forgotPasswordSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Enter your phone number and we will send you instructions to reset your password.'**
+  /// **'Enter your email and we will send you a password reset link.'**
   String get forgotPasswordSubtitle;
 
   /// No description provided for @sendResetLink.
@@ -341,13 +359,13 @@ abstract class AppLocalizations {
   /// No description provided for @checkYourPhone.
   ///
   /// In en, this message translates to:
-  /// **'Check your phone'**
+  /// **'Check your email'**
   String get checkYourPhone;
 
   /// No description provided for @resetInstructionsSent.
   ///
   /// In en, this message translates to:
-  /// **'We sent password reset instructions via SMS to\n{phone}'**
+  /// **'We sent password reset instructions to\n{phone}'**
   String resetInstructionsSent(String phone);
 
   /// No description provided for @backToSignIn.
@@ -503,7 +521,7 @@ abstract class AppLocalizations {
   /// No description provided for @validatorPasswordMinLength.
   ///
   /// In en, this message translates to:
-  /// **'Use at least 6 characters.'**
+  /// **'Use at least 8 characters.'**
   String get validatorPasswordMinLength;
 
   /// No description provided for @validatorNameRequired.

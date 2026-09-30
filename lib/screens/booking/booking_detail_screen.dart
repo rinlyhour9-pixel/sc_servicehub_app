@@ -18,9 +18,8 @@ class BookingDetailScreen extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final dateStr = DateFormat('EEE, dd MMM yyyy').format(booking.dateTime);
     final timeStr = DateFormat('hh:mm a').format(booking.dateTime);
-    // Demo technician if the booking hasn't been assigned one yet.
-    final techName = booking.technicianName ?? 'Sokun Therayuk';
-    final techPhone = booking.technicianPhone ?? '010314240';
+    final techName = booking.technicianName ?? 'Not assigned yet';
+    final techPhone = booking.technicianPhone ?? '';
     final statusLabel = switch (booking.status) {
       BookingStatus.pending => l10n.statusPending,
       BookingStatus.accepted => l10n.statusAccepted,

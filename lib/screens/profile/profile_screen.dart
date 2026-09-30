@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../core/app_colors.dart';
 import '../../l10n/app_localizations.dart';
+import '../../services/api_service.dart';
 import '../../widgets/language_picker.dart';
 import 'contact_support_screen.dart';
 import 'information_screen.dart';
@@ -26,7 +27,9 @@ class ProfileScreen extends StatelessWidget {
         title: Text(l10n.logOutConfirmTitle),
         content: Text(l10n.logOutConfirmBody),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: Text(l10n.cancel)),
+          TextButton(
+              onPressed: () => Navigator.pop(dialogContext, false),
+              child: Text(l10n.cancel)),
           FilledButton(
             style: FilledButton.styleFrom(backgroundColor: AppColors.danger),
             onPressed: () => Navigator.pop(dialogContext, true),
@@ -58,9 +61,14 @@ class ProfileScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(l10n.myProfileTitle, style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w700)),
+              Text(l10n.myProfileTitle,
+                  style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 24,
+                      fontWeight: FontWeight.w700)),
               const SizedBox(height: 4),
-              Text(l10n.myProfileSubtitle, style: const TextStyle(color: Colors.white70, height: 1.35)),
+              Text(l10n.myProfileSubtitle,
+                  style: const TextStyle(color: Colors.white70, height: 1.35)),
             ],
           ),
         ),
@@ -69,16 +77,23 @@ class ProfileScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _ProfileCard(),
+              _ProfileCard(user: ApiService.instance.currentUser),
               const SizedBox(height: 20),
-              Text(l10n.accountSettings, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
+              Text(l10n.accountSettings,
+                  style: const TextStyle(
+                      fontWeight: FontWeight.w700, fontSize: 16)),
               const SizedBox(height: 10),
               Container(
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(18),
                   border: Border.all(color: AppColors.border),
-                  boxShadow: const [BoxShadow(color: Color(0x080B5FA8), blurRadius: 14, offset: Offset(0, 5))],
+                  boxShadow: const [
+                    BoxShadow(
+                        color: Color(0x080B5FA8),
+                        blurRadius: 14,
+                        offset: Offset(0, 5))
+                  ],
                 ),
                 child: Column(
                   children: [
@@ -88,14 +103,16 @@ class ProfileScreen extends StatelessWidget {
                       subtitle: l10n.settingsInformationSubtitle,
                       onTap: () => Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (_) => const InformationScreen()),
+                        MaterialPageRoute(
+                            builder: (_) => const InformationScreen()),
                       ),
                     ),
                     const Divider(height: 1),
                     _SettingsTile(
                       icon: Icons.language_outlined,
                       title: l10n.settingsLanguage,
-                      subtitle: locale.languageCode == 'km' ? 'ភាសាខ្មែរ' : 'English',
+                      subtitle:
+                          locale.languageCode == 'km' ? 'ភាសាខ្មែរ' : 'English',
                       onTap: () => showLanguagePicker(
                         context,
                         current: locale,
@@ -109,7 +126,8 @@ class ProfileScreen extends StatelessWidget {
                       subtitle: l10n.settingsContactSupportSubtitle,
                       onTap: () => Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (_) => const ContactSupportScreen()),
+                        MaterialPageRoute(
+                            builder: (_) => const ContactSupportScreen()),
                       ),
                     ),
                     const Divider(height: 1),
@@ -119,7 +137,8 @@ class ProfileScreen extends StatelessWidget {
                       subtitle: l10n.settingsTermsPolicySubtitle,
                       onTap: () => Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (_) => const TermsPolicyScreen()),
+                        MaterialPageRoute(
+                            builder: (_) => const TermsPolicyScreen()),
                       ),
                     ),
                     const Divider(height: 1),
@@ -143,8 +162,14 @@ class ProfileScreen extends StatelessWidget {
 }
 
 class _ProfileCard extends StatelessWidget {
+  final ApiUser? user;
+  const _ProfileCard({required this.user});
+
   @override
   Widget build(BuildContext context) {
+    final name = user?.name ?? '—';
+    final detail =
+        user?.phone?.isNotEmpty == true ? user!.phone! : (user?.email ?? '');
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -152,17 +177,26 @@ class _ProfileCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(18),
         border: Border.all(color: AppColors.border),
       ),
-      child: const Row(
+      child: Row(
         children: [
-          CircleAvatar(radius: 30, backgroundColor: AppColors.primary, child: Text('SC', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold))),
-          SizedBox(width: 14),
+          const CircleAvatar(
+              radius: 30,
+              backgroundColor: AppColors.primary,
+              child: Text('SC',
+                  style: TextStyle(
+                      color: Colors.white, fontWeight: FontWeight.bold))),
+          const SizedBox(width: 14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Rin Lyhour', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
-                SizedBox(height: 4),
-                Text('+855 12 345 678', style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+                Text(name,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold, fontSize: 15)),
+                const SizedBox(height: 4),
+                Text(detail,
+                    style: const TextStyle(
+                        fontSize: 12, color: AppColors.textSecondary)),
               ],
             ),
           ),
@@ -195,10 +229,14 @@ class _SettingsTile extends StatelessWidget {
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 3),
       minVerticalPadding: 12,
       onTap: onTap,
-      leading: CircleAvatar(backgroundColor: iconBg, foregroundColor: iconColor, child: Icon(icon, size: 20)),
+      leading: CircleAvatar(
+          backgroundColor: iconBg,
+          foregroundColor: iconColor,
+          child: Icon(icon, size: 20)),
       title: Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
       subtitle: Text(subtitle, style: const TextStyle(fontSize: 12)),
-      trailing: const Icon(Icons.chevron_right_rounded, size: 20, color: AppColors.textSecondary),
+      trailing: const Icon(Icons.chevron_right_rounded,
+          size: 20, color: AppColors.textSecondary),
     );
   }
 }

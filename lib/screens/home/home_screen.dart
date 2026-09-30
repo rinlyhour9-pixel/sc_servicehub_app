@@ -6,6 +6,7 @@ import '../../core/app_assets.dart';
 import '../../core/app_colors.dart';
 import '../../l10n/app_localizations.dart';
 import '../../models/service_category.dart';
+import '../../services/api_service.dart';
 import '../../widgets/greeting_header.dart';
 import '../service/service_detail_screen.dart';
 
@@ -63,10 +64,10 @@ class _HomeScreenState extends State<HomeScreen> {
       padding: const EdgeInsets.fromLTRB(14, 10, 14, 20),
       children: [
         GreetingHeader(
-          name: l10n.roleClient,
+          name: ApiService.instance.currentUser?.name ?? l10n.roleClient,
           subtitle: l10n.greetingSubtitleClient,
           onNotifications: widget.onOpenNotifications,
-          notificationCount: 4,
+          notificationCount: 0,
         ),
         const SizedBox(height: 16),
         Container(

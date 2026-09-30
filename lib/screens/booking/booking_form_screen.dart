@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import '../../core/app_colors.dart';
+import '../../services/api_service.dart';
 import '../../state/client_booking_store.dart';
 import '../../l10n/app_localizations.dart';
-import '../../models/booking_model.dart';
 import '../../models/service_category.dart';
 import 'booking_confirmation_screen.dart';
-import 'location_picker_screen.dart';
 
 class BookingFormScreen extends StatefulWidget {
   final ServiceCategory category;
@@ -19,26 +19,17 @@ class _BookingFormScreenState extends State<BookingFormScreen> {
   late List<DateTime> _dates;
   final ScrollController _timeScrollController = ScrollController();
   int _selectedDateIndex = 1;
-  final List<String> _times = [
-    '8:00 AM',
-    '10:00 AM',
-    '12:00 PM',
-    '2:00 PM',
-    '4:00 PM',
-    '6:00 PM',
-  ];
-  static const _timeSlots = [
-    TimeOfDay(hour: 8, minute: 0),
-    TimeOfDay(hour: 10, minute: 0),
-    TimeOfDay(hour: 12, minute: 0),
-    TimeOfDay(hour: 14, minute: 0),
-    TimeOfDay(hour: 16, minute: 0),
-    TimeOfDay(hour: 18, minute: 0),
-  ];
-  int _selectedTimeIndex = 1;
-  TimeOfDay _selectedTime = const TimeOfDay(hour: 10, minute: 0);
+  List<DateTime> _timeSlots = const [];
+  int _selectedTimeIndex = 0;
+  DateTime? _selectedTime;
+  bool _loadingAvailability = false;
+  String? _availabilityError;
+  int _availabilityRequestId = 0;
   final TextEditingController _descriptionController = TextEditingController();
-  static const _serviceAddress = '#12, Preysor, Phnom Penh';
+  static const _defaultServiceAddress = '#12, Preysor, Phnom Penh';
+  late final TextEditingController _addressController =
+      TextEditingController(text: _defaultServiceAddress);
+  final List<XFile> _selectedPhotos = [];
   bool _submitting = false;
 
   @override
@@ -46,11 +37,13 @@ class _BookingFormScreenState extends State<BookingFormScreen> {
     super.initState();
     final today = DateTime.now();
     _dates = List.generate(5, (i) => today.add(Duration(days: i)));
+    WidgetsBinding.instance.addPostFrameCallback((_) => _loadAvailability());
   }
 
   @override
   void dispose() {
     _descriptionController.dispose();
+    _addressController.dispose();
     _timeScrollController.dispose();
     super.dispose();
   }
@@ -66,14 +59,17 @@ class _BookingFormScreenState extends State<BookingFormScreen> {
           List.generate(5, (index) => firstDate.add(Duration(days: index)));
       _selectedDateIndex = offset > 0 ? 0 : _dates.length - 1;
     });
+    _loadAvailability();
   }
 
   void _moveSelectedTime(int offset) {
+    if (_timeSlots.isEmpty) return;
     _selectTimeSlot(
-        (_selectedTimeIndex + offset + _times.length) % _times.length);
+        (_selectedTimeIndex + offset + _timeSlots.length) % _timeSlots.length);
   }
 
   void _selectTimeSlot(int index) {
+    if (index < 0 || index >= _timeSlots.length) return;
     setState(() {
       _selectedTimeIndex = index;
       _selectedTime = _timeSlots[index];
@@ -95,6 +91,51 @@ class _BookingFormScreenState extends State<BookingFormScreen> {
     return MaterialLocalizations.of(context).formatTimeOfDay(time);
   }
 
+  Future<ApiServiceItem> _findService() async {
+    final wanted = _normalize(widget.category.id.name);
+    final items = await ApiService.instance.services();
+    for (final item in items) {
+      if (_normalize(item.name) == wanted) return item;
+    }
+    throw const ApiException(
+        'This service is not available from the booking system yet.');
+  }
+
+  Future<void> _loadAvailability() async {
+    final requestId = ++_availabilityRequestId;
+    setState(() {
+      _loadingAvailability = true;
+      _availabilityError = null;
+      _timeSlots = const [];
+      _selectedTime = null;
+    });
+    try {
+      final service = await _findService();
+      final date = _dates[_selectedDateIndex];
+      final slots = await ApiService.instance.availability(
+        serviceId: service.id,
+        date: date,
+      );
+      if (!mounted || requestId != _availabilityRequestId) return;
+      setState(() {
+        _timeSlots = slots;
+        _selectedTimeIndex = 0;
+        _selectedTime = slots.isEmpty ? null : slots.first;
+      });
+    } on ApiException catch (error) {
+      if (!mounted || requestId != _availabilityRequestId) return;
+      setState(() {
+        _timeSlots = const [];
+        _selectedTime = null;
+        _availabilityError = error.message;
+      });
+    } finally {
+      if (mounted && requestId == _availabilityRequestId) {
+        setState(() => _loadingAvailability = false);
+      }
+    }
+  }
+
   static const List<BoxShadow> _cardShadow = [
     BoxShadow(color: Color(0x14000000), blurRadius: 16, offset: Offset(0, 6)),
   ];
@@ -110,51 +151,74 @@ class _BookingFormScreenState extends State<BookingFormScreen> {
     );
   }
 
-  void _pickImages() => ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('Photo upload is unavailable in the static preview.')),
+  Future<void> _pickImages() async {
+    try {
+      final photos = await ImagePicker().pickMultiImage(
+        limit: 8,
+        imageQuality: 80,
+        maxWidth: 1600,
+        maxHeight: 1600,
       );
-
-  Future<void> _openLocation() async {
-    await Navigator.push<void>(
-      context,
-      MaterialPageRoute(
-        builder: (_) => const LocationPickerScreen(),
-      ),
-    );
+      if (!mounted || photos.isEmpty) return;
+      setState(() {
+        _selectedPhotos
+          ..clear()
+          ..addAll(photos.take(8));
+      });
+    } catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Could not select photos: $error')),
+        );
+      }
+    }
   }
 
   Future<void> _submitBooking() async {
     if (_submitting) return;
-    final l10n = AppLocalizations.of(context)!;
-    final selectedDate = _dates[_selectedDateIndex];
-    final categoryName = widget.category.name(l10n);
+    if (_selectedTime == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            content: Text(_availabilityError ?? 'Select an available time.')),
+      );
+      return;
+    }
+    if (_addressController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Enter a service address.')),
+      );
+      return;
+    }
     setState(() => _submitting = true);
-    final booking = Booking(
-      id: 'DEMO-${DateTime.now().millisecondsSinceEpoch}',
-      serviceName: categoryName,
-      iconAsset: widget.category.id.name,
-      dateTime: DateTime(selectedDate.year, selectedDate.month,
-          selectedDate.day, _selectedTime.hour, _selectedTime.minute),
-      address: _serviceAddress,
-      description: _descriptionController.text.trim(),
-      status: BookingStatus.pending,
-      timeline: const [
-        BookingStatusStep(label: 'Booking Confirmed', isDone: true, isCurrent: true),
-        BookingStatusStep(label: 'Technician Assigned'),
-        BookingStatusStep(label: 'Service in Process'),
-        BookingStatusStep(label: 'Service Complete'),
-      ],
-    );
-    ClientBookingStore.instance.addBooking(booking);
-    if (!mounted) return;
-    setState(() => _submitting = false);
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-          builder: (_) => BookingConfirmationScreen(booking: booking)),
-    );
+    try {
+      final match = await _findService();
+      final booking = await ApiService.instance.createBooking(
+        serviceId: match.id,
+        scheduledAt: _selectedTime!,
+        address: _addressController.text.trim(),
+        description: _descriptionController.text,
+        photos: _selectedPhotos,
+      );
+      ClientBookingStore.instance.addBooking(booking);
+      if (!mounted) return;
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (_) => BookingConfirmationScreen(booking: booking)),
+      );
+    } on ApiException catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(error.message)),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _submitting = false);
+    }
   }
+
+  String _normalize(String value) =>
+      value.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]'), '');
 
   @override
   Widget build(BuildContext context) {
@@ -266,7 +330,10 @@ class _BookingFormScreenState extends State<BookingFormScreen> {
                         final d = _dates[i];
                         final selected = i == _selectedDateIndex;
                         return GestureDetector(
-                          onTap: () => setState(() => _selectedDateIndex = i),
+                          onTap: () {
+                            setState(() => _selectedDateIndex = i);
+                            _loadAvailability();
+                          },
                           child: AnimatedContainer(
                             duration: const Duration(milliseconds: 200),
                             curve: Curves.easeOutCubic,
@@ -347,7 +414,13 @@ class _BookingFormScreenState extends State<BookingFormScreen> {
               children: [
                 const Icon(Icons.access_time, color: AppColors.primary),
                 const SizedBox(width: 10),
-                Text(l10n.selectedTimePrefix(_formatTime(_selectedTime)),
+                Text(
+                    _selectedTime == null
+                        ? (_loadingAvailability
+                            ? 'Loading times…'
+                            : 'No available times')
+                        : l10n.selectedTimePrefix(_formatTime(
+                            TimeOfDay.fromDateTime(_selectedTime!))),
                     style: const TextStyle(
                         fontWeight: FontWeight.w700,
                         color: AppColors.primaryDark)),
@@ -377,7 +450,7 @@ class _BookingFormScreenState extends State<BookingFormScreen> {
                     controller: _timeScrollController,
                     scrollDirection: Axis.horizontal,
                     child: Row(
-                        children: List.generate(_times.length, (i) {
+                        children: List.generate(_timeSlots.length, (i) {
                       final selected = i == _selectedTimeIndex;
                       return Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 4),
@@ -410,7 +483,9 @@ class _BookingFormScreenState extends State<BookingFormScreen> {
                                         ]
                                       : null,
                                 ),
-                                child: Text(_times[i],
+                                child: Text(
+                                    _formatTime(
+                                        TimeOfDay.fromDateTime(_timeSlots[i])),
                                     textAlign: TextAlign.center,
                                     style: TextStyle(
                                         color: selected
@@ -443,59 +518,36 @@ class _BookingFormScreenState extends State<BookingFormScreen> {
             color: Colors.white,
             borderRadius: BorderRadius.circular(16),
             elevation: 0,
-            child: InkWell(
-              onTap: _openLocation,
-              borderRadius: BorderRadius.circular(16),
-              child: Container(
-                padding: const EdgeInsets.all(14),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: _cardShadow,
-                ),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 40,
-                      height: 40,
-                      decoration: const BoxDecoration(
-                          color: AppColors.tileBackground,
-                          shape: BoxShape.circle),
-                      child: const Icon(Icons.location_on_outlined,
-                          color: AppColors.primary, size: 20),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(l10n.homeLabel,
-                              style:
-                                  const TextStyle(fontWeight: FontWeight.bold)),
-                          const SizedBox(height: 2),
-                          const Text(
-                            _serviceAddress,
-                            style: TextStyle(
-                                fontSize: 12, color: AppColors.textSecondary),
-                          ),
-                        ],
+            child: Container(
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: _cardShadow,
+              ),
+              child: Row(
+                children: [
+                  const CircleAvatar(
+                    radius: 20,
+                    backgroundColor: AppColors.tileBackground,
+                    child: Icon(Icons.location_on_outlined,
+                        color: AppColors.primary, size: 20),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: TextField(
+                      controller: _addressController,
+                      textCapitalization: TextCapitalization.words,
+                      minLines: 1,
+                      maxLines: 2,
+                      decoration: InputDecoration(
+                        labelText: l10n.homeLabel,
+                        border: InputBorder.none,
+                        isDense: true,
                       ),
                     ),
-                    Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(Icons.map_outlined,
-                            size: 20, color: AppColors.primary),
-                        const SizedBox(height: 2),
-                        Text(l10n.mapLabel,
-                            style: const TextStyle(
-                                fontSize: 10,
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.primary)),
-                      ],
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -532,7 +584,9 @@ class _BookingFormScreenState extends State<BookingFormScreen> {
               borderRadius: BorderRadius.circular(16),
               boxShadow: _cardShadow,
             ),
-            child: Row(
+            child: Wrap(
+              spacing: 10,
+              runSpacing: 10,
               children: [
                 InkWell(
                   onTap: _pickImages,
@@ -549,6 +603,29 @@ class _BookingFormScreenState extends State<BookingFormScreen> {
                         color: AppColors.primary),
                   ),
                 ),
+                ..._selectedPhotos.map((photo) => Container(
+                      constraints: const BoxConstraints(maxWidth: 180),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: AppColors.tileBackground,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.image_outlined,
+                              color: AppColors.primary, size: 18),
+                          const SizedBox(width: 6),
+                          Flexible(
+                            child: Text(photo.name,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(fontSize: 12)),
+                          ),
+                        ],
+                      ),
+                    )),
               ],
             ),
           ),

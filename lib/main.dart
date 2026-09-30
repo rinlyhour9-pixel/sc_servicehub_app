@@ -8,6 +8,7 @@ import 'screens/main_navigation.dart';
 import 'screens/onboarding/onboarding_screen.dart';
 import 'screens/start/start_screen.dart';
 import 'screens/technician/technician_navigation.dart';
+import 'services/api_service.dart';
 
 void main() {
   runApp(const SoftCreativeApp());
@@ -57,12 +58,37 @@ class _AppShell extends StatefulWidget {
 class _AppShellState extends State<_AppShell> {
   bool _isAuthenticated = false;
   bool _hasSeenOnboarding = false;
+  bool _restoringSession = true;
   UserRole? _selectedRole;
+
+  @override
+  void initState() {
+    super.initState();
+    _restoreSession();
+  }
+
+  Future<void> _restoreSession() async {
+    try {
+      final user = await ApiService.instance.restoreSession();
+      if (user != null) {
+        _selectedRole = user.role;
+        _isAuthenticated = true;
+        _hasSeenOnboarding = true;
+      }
+    } on ApiException catch (error) {
+      debugPrint('Could not restore API session: ${error.message}');
+    } finally {
+      if (mounted) setState(() => _restoringSession = false);
+    }
+  }
 
   void _completeOnboarding() => setState(() => _hasSeenOnboarding = true);
 
   @override
   Widget build(BuildContext context) {
+    if (_restoringSession) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
     if (_selectedRole == null) {
       return StartScreen(
         onRoleSelected: (role) => setState(() => _selectedRole = role),
@@ -117,6 +143,7 @@ class _AppShellState extends State<_AppShell> {
   }
 
   void _logout() {
+    ApiService.instance.logout().catchError((_) {});
     setState(() {
       _isAuthenticated = false;
       _selectedRole = null;

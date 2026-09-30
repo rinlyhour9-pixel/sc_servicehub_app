@@ -78,6 +78,15 @@ class AppLocalizationsKm extends AppLocalizations {
   String get phoneNumberHint => '+855 12 345 678';
 
   @override
+  String get emailAddress => 'អាសយដ្ឋានអ៊ីមែល';
+
+  @override
+  String get emailAddressHint => 'name@example.com';
+
+  @override
+  String get validatorEmailInvalid => 'សូមបញ្ចូលអាសយដ្ឋានអ៊ីមែលដែលត្រឹមត្រូវ។';
+
+  @override
   String get password => 'ពាក្យសម្ងាត់';
 
   @override
@@ -132,17 +141,17 @@ class AppLocalizationsKm extends AppLocalizations {
 
   @override
   String get forgotPasswordSubtitle =>
-      'បញ្ចូលលេខទូរស័ព្ទរបស់អ្នក ហើយយើងនឹងផ្ញើការណែនាំដើម្បីកំណត់ពាក្យសម្ងាត់ឡើងវិញ។';
+      'សូមបញ្ចូលអ៊ីមែលរបស់អ្នក ដើម្បីទទួលតំណកំណត់ពាក្យសម្ងាត់ឡើងវិញ។';
 
   @override
   String get sendResetLink => 'ផ្ញើតំណភ្ជាប់កំណត់ឡើងវិញ';
 
   @override
-  String get checkYourPhone => 'ពិនិត្យទូរស័ព្ទរបស់អ្នក';
+  String get checkYourPhone => 'សូមពិនិត្យអ៊ីមែលរបស់អ្នក';
 
   @override
   String resetInstructionsSent(String phone) {
-    return 'យើងបានផ្ញើការណែនាំកំណត់ពាក្យសម្ងាត់ឡើងវិញតាម SMS ទៅកាន់\n$phone';
+    return 'យើងបានផ្ញើការណែនាំកំណត់ពាក្យសម្ងាត់ឡើងវិញទៅកាន់\n$phone';
   }
 
   @override
@@ -225,7 +234,7 @@ class AppLocalizationsKm extends AppLocalizations {
   String get validatorPhoneInvalid => 'សូមបញ្ចូលលេខទូរស័ព្ទដែលត្រឹមត្រូវ។';
 
   @override
-  String get validatorPasswordMinLength => 'ត្រូវការយ៉ាងតិច ៦ តួអក្សរ។';
+  String get validatorPasswordMinLength => 'ត្រូវការយ៉ាងតិច ៨ តួអក្សរ។';
 
   @override
   String get validatorNameRequired => 'សូមបញ្ចូលឈ្មោះរបស់អ្នក។';

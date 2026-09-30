@@ -24,6 +24,9 @@
   "loginAdminSubtitle": "Sign in to manage bookings, technicians, and customers.",
   "phoneNumber": "Phone number",
   "phoneNumberHint": "+855 12 345 678",
+  "emailAddress": "Email address",
+  "emailAddressHint": "name@example.com",
+  "validatorEmailInvalid": "Enter a valid email address.",
   "password": "Password",
   "passwordHintSignIn": "Enter your password",
   "passwordHintSignUp": "Create a password",
@@ -43,10 +46,10 @@
   "alreadyHaveAccount": "Already have an account? Sign in",
 
   "forgotPasswordTitle": "Forgot password?",
-  "forgotPasswordSubtitle": "Enter your phone number and we will send you instructions to reset your password.",
+  "forgotPasswordSubtitle": "Enter your email and we will send you a password reset link.",
   "sendResetLink": "Send Reset Link",
-  "checkYourPhone": "Check your phone",
-  "resetInstructionsSent": "We sent password reset instructions via SMS to\n{phone}",
+  "checkYourPhone": "Check your email",
+  "resetInstructionsSent": "We sent password reset instructions to\n{phone}",
   "@resetInstructionsSent": {
     "placeholders": {
       "phone": { "type": "String" }
@@ -86,7 +89,7 @@
   "chooseLanguage": "Choose language",
 
   "validatorPhoneInvalid": "Enter a valid phone number.",
-  "validatorPasswordMinLength": "Use at least 6 characters.",
+  "validatorPasswordMinLength": "Use at least 8 characters.",
   "validatorNameRequired": "Enter your name.",
 
   "statusPending": "Pending",

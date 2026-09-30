@@ -24,6 +24,9 @@
   "loginAdminSubtitle": "ចូលគណនីដើម្បីគ្រប់គ្រងការកក់ ជាងបច្ចេកទេស និងអតិថិជន។",
   "phoneNumber": "លេខទូរស័ព្ទ",
   "phoneNumberHint": "+855 12 345 678",
+  "emailAddress": "អាសយដ្ឋានអ៊ីមែល",
+  "emailAddressHint": "name@example.com",
+  "validatorEmailInvalid": "សូមបញ្ចូលអាសយដ្ឋានអ៊ីមែលដែលត្រឹមត្រូវ។",
   "password": "ពាក្យសម្ងាត់",
   "passwordHintSignIn": "បញ្ចូលពាក្យសម្ងាត់របស់អ្នក",
   "passwordHintSignUp": "បង្កើតពាក្យសម្ងាត់",
@@ -43,10 +46,10 @@
   "alreadyHaveAccount": "មានគណនីរួចហើយ? ចូលគណនី",
 
   "forgotPasswordTitle": "ភ្លេចពាក្យសម្ងាត់?",
-  "forgotPasswordSubtitle": "បញ្ចូលលេខទូរស័ព្ទរបស់អ្នក ហើយយើងនឹងផ្ញើការណែនាំដើម្បីកំណត់ពាក្យសម្ងាត់ឡើងវិញ។",
+  "forgotPasswordSubtitle": "សូមបញ្ចូលអ៊ីមែលរបស់អ្នក ដើម្បីទទួលតំណកំណត់ពាក្យសម្ងាត់ឡើងវិញ។",
   "sendResetLink": "ផ្ញើតំណភ្ជាប់កំណត់ឡើងវិញ",
-  "checkYourPhone": "ពិនិត្យទូរស័ព្ទរបស់អ្នក",
-  "resetInstructionsSent": "យើងបានផ្ញើការណែនាំកំណត់ពាក្យសម្ងាត់ឡើងវិញតាម SMS ទៅកាន់\n{phone}",
+  "checkYourPhone": "សូមពិនិត្យអ៊ីមែលរបស់អ្នក",
+  "resetInstructionsSent": "យើងបានផ្ញើការណែនាំកំណត់ពាក្យសម្ងាត់ឡើងវិញទៅកាន់\n{phone}",
   "backToSignIn": "ត្រឡប់ទៅចូលគណនី",
 
   "navHome": "ទំព័រដើម",
@@ -76,7 +79,7 @@
   "chooseLanguage": "ជ្រើសរើសភាសា",
 
   "validatorPhoneInvalid": "សូមបញ្ចូលលេខទូរស័ព្ទដែលត្រឹមត្រូវ។",
-  "validatorPasswordMinLength": "ត្រូវការយ៉ាងតិច ៦ តួអក្សរ។",
+  "validatorPasswordMinLength": "ត្រូវការយ៉ាងតិច ៨ តួអក្សរ។",
   "validatorNameRequired": "សូមបញ្ចូលឈ្មោះរបស់អ្នក។",
 
   "statusPending": "រង់ចាំ",

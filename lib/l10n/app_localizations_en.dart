@@ -77,6 +77,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get phoneNumberHint => '+855 12 345 678';
 
   @override
+  String get emailAddress => 'Email address';
+
+  @override
+  String get emailAddressHint => 'name@example.com';
+
+  @override
+  String get validatorEmailInvalid => 'Enter a valid email address.';
+
+  @override
   String get password => 'Password';
 
   @override
@@ -131,17 +140,17 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get forgotPasswordSubtitle =>
-      'Enter your phone number and we will send you instructions to reset your password.';
+      'Enter your email and we will send you a password reset link.';
 
   @override
   String get sendResetLink => 'Send Reset Link';
 
   @override
-  String get checkYourPhone => 'Check your phone';
+  String get checkYourPhone => 'Check your email';
 
   @override
   String resetInstructionsSent(String phone) {
-    return 'We sent password reset instructions via SMS to\n$phone';
+    return 'We sent password reset instructions to\n$phone';
   }
 
   @override
@@ -223,7 +232,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get validatorPhoneInvalid => 'Enter a valid phone number.';
 
   @override
-  String get validatorPasswordMinLength => 'Use at least 6 characters.';
+  String get validatorPasswordMinLength => 'Use at least 8 characters.';
 
   @override
   String get validatorNameRequired => 'Enter your name.';

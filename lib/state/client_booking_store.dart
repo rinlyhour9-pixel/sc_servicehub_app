@@ -91,4 +91,25 @@ class ClientBookingStore extends ChangeNotifier {
     upcoming.insert(0, booking);
     notifyListeners();
   }
+
+  void replaceWithApiBookings(List<Booking> bookings) {
+    upcoming.clear();
+    history.clear();
+    for (final booking in bookings) {
+      if (booking.status == BookingStatus.completed ||
+          booking.status == BookingStatus.cancelled ||
+          booking.dateTime.isBefore(DateTime.now())) {
+        history.add(booking);
+      } else {
+        upcoming.add(booking);
+      }
+    }
+    notifyListeners();
+  }
+
+  void clear() {
+    upcoming.clear();
+    history.clear();
+    notifyListeners();
+  }
 }

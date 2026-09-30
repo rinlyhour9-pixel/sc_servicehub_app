@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../services/api_service.dart';
+import '../state/client_booking_store.dart';
 import '../widgets/app_bottom_nav.dart';
 import 'home/home_screen.dart';
 import 'booking/my_booking_screen.dart';
@@ -23,6 +25,22 @@ class MainNavigation extends StatefulWidget {
 
 class _MainNavigationState extends State<MainNavigation> {
   int _index = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _refreshBookings();
+  }
+
+  Future<void> _refreshBookings() async {
+    ClientBookingStore.instance.clear();
+    try {
+      ClientBookingStore.instance
+          .replaceWithApiBookings(await ApiService.instance.bookings());
+    } on ApiException catch (error) {
+      debugPrint('Could not load bookings: ${error.message}');
+    }
+  }
 
   void goToTab(int index) => setState(() => _index = index);
 

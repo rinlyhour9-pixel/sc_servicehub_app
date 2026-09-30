@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../l10n/app_localizations.dart';
+import '../../services/api_service.dart';
 import 'auth_widgets.dart';
 
 class SignUpScreen extends StatefulWidget {
@@ -15,6 +16,7 @@ class SignUpScreen extends StatefulWidget {
 class _SignUpScreenState extends State<SignUpScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
+  final _emailController = TextEditingController();
   final _phoneController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
@@ -23,6 +25,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   @override
   void dispose() {
     _nameController.dispose();
+    _emailController.dispose();
     _phoneController.dispose();
     _passwordController.dispose();
     super.dispose();
@@ -31,11 +34,25 @@ class _SignUpScreenState extends State<SignUpScreen> {
   Future<void> _createAccount() async {
     if (!_formKey.currentState!.validate() || _submitting) return;
     setState(() => _submitting = true);
-    // Static preview: account details remain on this device and are not saved.
-    if (!mounted) return;
-    setState(() => _submitting = false);
-    widget.onAuthenticated();
-    Navigator.of(context).popUntil((route) => route.isFirst);
+    try {
+      await ApiService.instance.register(
+        name: _nameController.text,
+        email: _emailController.text,
+        phone: _phoneController.text,
+        password: _passwordController.text,
+      );
+      if (!mounted) return;
+      widget.onAuthenticated();
+      Navigator.of(context).popUntil((route) => route.isFirst);
+    } on ApiException catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(error.message)),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _submitting = false);
+    }
   }
 
   @override
@@ -61,6 +78,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     : null),
             const SizedBox(height: 18),
             AuthField(
+                controller: _emailController,
+                label: l10n.emailAddress,
+                hint: l10n.emailAddressHint,
+                icon: Icons.email_outlined,
+                keyboardType: TextInputType.emailAddress,
+                validator: (value) => value == null || !value.contains('@')
+                    ? l10n.validatorEmailInvalid
+                    : null),
+            const SizedBox(height: 18),
+            AuthField(
                 controller: _phoneController,
                 label: l10n.phoneNumber,
                 hint: l10n.phoneNumberHint,
@@ -82,7 +109,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   icon: Icon(_obscurePassword
                       ? Icons.visibility_outlined
                       : Icons.visibility_off_outlined)),
-              validator: (value) => value == null || value.length < 6
+              validator: (value) => value == null || value.length < 8
                   ? l10n.validatorPasswordMinLength
                   : null,
             ),

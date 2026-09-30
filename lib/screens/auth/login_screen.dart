@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../core/app_colors.dart';
 import '../../l10n/app_localizations.dart';
 import '../../models/user_role.dart';
+import '../../services/api_service.dart';
 import 'auth_widgets.dart';
 import 'forgot_password_screen.dart';
 import 'sign_up_screen.dart';
@@ -27,7 +28,7 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _phoneController = TextEditingController();
+  final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
   bool _rememberMe = true;
@@ -35,7 +36,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   void dispose() {
-    _phoneController.dispose();
+    _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
@@ -43,10 +44,27 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void> _signIn() async {
     if (!_formKey.currentState!.validate() || _submitting) return;
     setState(() => _submitting = true);
-    // Static preview: validation is local and no account is sent or saved.
-    if (mounted) {
-      setState(() => _submitting = false);
-      widget.onAuthenticated();
+    try {
+      final user = await ApiService.instance.login(
+        email: _emailController.text,
+        password: _passwordController.text,
+      );
+      if (user.role != widget.role) {
+        await ApiService.instance.logout();
+        throw const ApiException(
+            'This account does not have the selected role.');
+      }
+      if (mounted) widget.onAuthenticated();
+    } on ApiException catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(error.message)),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _submitting = false);
+      }
     }
   }
 
@@ -85,13 +103,13 @@ class _LoginScreenState extends State<LoginScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             AuthField(
-              controller: _phoneController,
-              label: l10n.phoneNumber,
-              hint: l10n.phoneNumberHint,
-              icon: Icons.phone_outlined,
-              keyboardType: TextInputType.phone,
-              validator: (value) => value == null || value.trim().length < 8
-                  ? l10n.validatorPhoneInvalid
+              controller: _emailController,
+              label: l10n.emailAddress,
+              hint: l10n.emailAddressHint,
+              icon: Icons.email_outlined,
+              keyboardType: TextInputType.emailAddress,
+              validator: (value) => value == null || !value.contains('@')
+                  ? l10n.validatorEmailInvalid
                   : null,
             ),
             const SizedBox(height: 18),

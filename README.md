@@ -54,47 +54,52 @@ Home (tap a category tile)
         assigned technician, and the status timeline
 ```
 
-`BookingFormScreen._submitBooking()` builds a real `Booking` object (with a
-generated ID, the chosen date/time, description, and an initial timeline)
-and passes it forward — that's the same `Booking` model used everywhere
-else, so this flow and the **My Booking** tab share one source of truth.
+`BookingFormScreen` loads the matching active service and available appointment
+slots from the Laravel API. Submitting the form sends the selected time,
+address, description, and optional photos. The server booking is then shown in
+the confirmation, detail, and My Booking screens.
 
-**My Booking tab → Booking Detail**: tapping any `BookingCard` in
-`MyBookingScreen` also pushes `BookingDetailScreen` for that booking, so
-you land on the same status screen whether you just booked it or you're
-checking on an older one.
+The notification tab loads the signed-in user's notifications and marks a
+notification read when its booking action is selected. Logging out clears the
+saved token and asks the API to revoke it.
+## Connected behavior
 
-**Notification → Booking Detail**: `_NotificationTile.onPressed` in
-`notification_screen.dart` is stubbed with a `TODO` — wire it to look up
-the booking by `notification.relatedBookingId` and push
-`BookingDetailScreen`, once bookings live in shared state (see below)
-rather than a local mock list per screen.
+Client sign-in, sign-up, password reset requests, service availability,
+bookings, photo uploads, notifications, and logout use the Laravel API. The
+client booking store is refreshed from the signed-in account. Admin and
+technician sign-in use the same API, while their dashboards still need their
+API data wired into the screens.
 
-**Profile → Log Out**: stubbed in `_SettingsTile` for your auth logic.
-
-Right now `MyBookingScreen` and `BookingFormScreen` each keep their own
-mock data — swap that for a shared state solution (see below) once you
-use the built-in in-memory preview state, so a booking made through the flow appears in
-the My Booking list.
-
-## Static app
-
-1. **State management**: replace the local mock lists in
-   `MyBookingScreen` / `NotificationScreen` with `Provider`, `Riverpod`, or
-   `Bloc` so a booking created on Home instantly reflects in Booking/Notification.
-2. **Static behavior**: form fields and sample content remain only in memory
-   for the current session; no information leaves the app.
-3. **Routing**: if you outgrow the simple `IndexedStack` pattern (e.g. need
-   deep links or a detail page pushed on top of a tab), introduce
-   `go_router` and keep `MainNavigation` as a `ShellRoute`.
-4. **Assets**: the mockups' icon illustrations (wrench, faucet, AC unit,
-   etc.) are currently swapped for Material icons in `service_category.dart`
-   — drop your real icon/illustration assets into `assets/icons/` and update
-   `pubspec.yaml` + the model to reference asset paths instead.
-
+The service illustrations remain bundled app assets. The app matches each
+service tile to an active backend service by name.
 ## Run it
 
 ```bash
 flutter pub get
 flutter run
 ```
+
+## Connect to the service system API
+
+The app uses the Laravel mobile API in `sc_servicehub_system` for sign-in,
+account creation, customer bookings, available time slots, and notifications.
+Sanctum bearer tokens are stored with the platform secure-storage plugin.
+
+Set the API root URL when running against a deployed server:
+
+```bash
+flutter run --dart-define=API_BASE_URL=https://your-host.example/api
+```
+
+The default development URL is `http://localhost:8000/api` for web, desktop,
+and iOS Simulator, and `http://10.0.2.2:8000/api` for the Android emulator.
+For a physical device, set `API_BASE_URL` to the computer's reachable LAN
+address. Use HTTPS for deployed builds; Android cleartext access is enabled for
+debug builds only.
+
+Before booking, the system must return active entries from `GET /api/services`
+whose names match the app service names (Electrician, Plumber, AC Repair, TV
+Repair, Painter, Home Cleaning, Cooking Range, Washing Machine, Fridge Repair).
+The current backend seeder creates service categories, while the mobile API
+reads its separate `services` table. Add the mobile service rows on the backend
+or the booking form will report that the selected service is unavailable.
